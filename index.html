@@ -3,22 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Emerald Mail Silver v4</title>
+<title>Emerald Mail V6 Firestore</title>
 
 <style>
-:root {
+:root{
   --bg1:#eaf0f9;
-  --bg2:#9eadc4;
-  --glass:rgba(242,247,255,.82);
+  --bg2:#9eacc4;
+  --panel:#eef4fc;
+  --glass:rgba(245,249,255,.88);
   --line:#8291a8;
-  --line2:#b9c4d3;
+  --line2:#b8c4d3;
   --text:#132033;
-  --muted:#607089;
-  --blue1:#5b93d8;
-  --blue2:#1f5caa;
-  --paper:#fff;
-  --danger:#8f1d1d;
+  --muted:#63728a;
+  --blue1:#5e96d9;
+  --blue2:#1d5aa6;
+  --danger:#8b1e1e;
   --success:#1f6b39;
+  --paper:#fff;
 }
 
 *{box-sizing:border-box}
@@ -28,7 +29,7 @@ body{
   font-size:13px;
   color:var(--text);
   background:
-    radial-gradient(circle at 15% 0%,rgba(255,255,255,.95),transparent 35%),
+    radial-gradient(circle at 20% 0%,rgba(255,255,255,.96),transparent 35%),
     linear-gradient(135deg,var(--bg1),var(--bg2));
 }
 
@@ -66,7 +67,7 @@ label{display:block;margin-bottom:3px;font-weight:600;color:#283951}
   overflow:hidden;
   border:1px solid rgba(56,70,93,.8);
   border-radius:10px;
-  background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(225,233,246,.78));
+  background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(225,233,246,.8));
   box-shadow:0 18px 44px rgba(36,50,75,.35),inset 0 1px rgba(255,255,255,.95);
   backdrop-filter:blur(12px);
 }
@@ -82,7 +83,7 @@ label{display:block;margin-bottom:3px;font-weight:600;color:#283951}
 }
 .brand{display:flex;align-items:center;gap:10px;min-width:0}
 .logo{
-  width:28px;height:28px;border-radius:7px;
+  width:30px;height:30px;border-radius:7px;
   display:grid;place-items:center;
   color:#fff;font-size:10px;font-weight:800;
   background:linear-gradient(135deg,#2f7bd5,#173f75);
@@ -91,21 +92,41 @@ label{display:block;margin-bottom:3px;font-weight:600;color:#283951}
 .brand-title{font-size:16px;font-weight:700}
 .brand-subtitle{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-.connection{
+#loginScreen{flex:1;display:grid;place-items:center;padding:20px;overflow:auto}
+.login-card{
+  width:min(820px,100%);
+  border:1px solid #7d8fa9;
+  border-radius:10px;
+  background:var(--glass);
+  box-shadow:0 12px 30px rgba(30,45,70,.28),inset 0 1px rgba(255,255,255,.95);
+  overflow:hidden;
+}
+.login-head{padding:14px;border-bottom:1px solid var(--line2);background:linear-gradient(#fff,#d9e4f2)}
+.login-head h1{font-size:20px;margin:0 0 4px}
+.login-head p{margin:0;color:var(--muted)}
+.login-body{padding:14px;display:grid;gap:10px}
+.login-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.login-row input{width:100%}
+.login-actions{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:4px}
+.admin-box{margin-top:14px;border-top:1px solid var(--line2);padding-top:14px}
+.admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+
+#appScreen{flex:1;min-height:0;display:none;flex-direction:column}
+.topbar{
   display:grid;
-  grid-template-columns:minmax(190px,1.2fr) minmax(150px,.8fr) minmax(190px,1fr) auto auto;
+  grid-template-columns:1fr auto auto auto;
   gap:8px;
   padding:10px;
   border-bottom:1px solid var(--line2);
   background:rgba(232,239,249,.86);
+  align-items:center;
 }
-.field{min-width:0}
-.field input{width:100%}
-.checkline{display:flex;align-items:end;gap:6px;padding-bottom:3px;white-space:nowrap}
-.checkline input{box-shadow:none}
+.account-line{min-width:0}
+.account-name{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.account-meta{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-.main{flex:1;min-height:0;display:grid;grid-template-columns:190px minmax(290px,390px) minmax(360px,1fr)}
-.sidebar{overflow:auto;padding:10px;border-right:1px solid var(--line2);background:rgba(232,238,248,.6)}
+.main{flex:1;min-height:0;display:grid;grid-template-columns:190px minmax(300px,390px) minmax(360px,1fr)}
+.sidebar{overflow:auto;padding:10px;border-right:1px solid var(--line2);background:rgba(232,238,248,.62)}
 .section{margin-bottom:14px}
 .section-title{font-size:12px;font-weight:800;color:#33445f;text-transform:uppercase;letter-spacing:.4px;margin-bottom:7px}
 .sidebtn{width:100%;text-align:left;margin-bottom:6px;display:flex;justify-content:space-between;gap:8px}
@@ -146,7 +167,7 @@ label{display:block;margin-bottom:3px;font-weight:600;color:#283951}
 
 .overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(18,31,50,.38);backdrop-filter:blur(5px);z-index:50}
 .overlay.open{display:flex}
-.dialog{width:min(840px,100%);height:min(720px,100%);display:flex;flex-direction:column;border:1px solid rgba(54,70,94,.85);border-radius:10px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(226,234,246,.94));box-shadow:0 18px 50px rgba(0,0,0,.38),inset 0 1px rgba(255,255,255,.98)}
+.dialog{width:min(850px,100%);height:min(720px,100%);display:flex;flex-direction:column;border:1px solid rgba(54,70,94,.85);border-radius:10px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(226,234,246,.94));box-shadow:0 18px 50px rgba(0,0,0,.38),inset 0 1px rgba(255,255,255,.98)}
 .dialog-title{min-height:40px;display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:linear-gradient(#fff,#d2deef 48%,#97a9c5);border-bottom:1px solid #8394ad;font-weight:700}
 .dialog-body{flex:1;min-height:0;overflow:auto;padding:12px;display:grid;gap:8px}
 .compose-row{display:grid;grid-template-columns:76px 1fr;gap:8px;align-items:center}
@@ -168,8 +189,8 @@ label{display:block;margin-bottom:3px;font-weight:600;color:#283951}
 .success{color:var(--success);font-weight:700}
 
 @media(max-width:980px){
-  .connection{grid-template-columns:1fr}
-  .checkline{align-items:center;padding-bottom:0}
+  .login-grid,.admin-grid{grid-template-columns:1fr}
+  .topbar{grid-template-columns:1fr}
   .main{grid-template-columns:150px 1fr}
   .viewer-pane{display:none}
   .main.show-viewer{grid-template-columns:1fr}
@@ -184,90 +205,146 @@ label{display:block;margin-bottom:3px;font-weight:600;color:#283951}
   <div class="window">
     <header class="titlebar">
       <div class="brand">
-        <div class="logo">MAIL</div>
+        <div class="logo">V6</div>
         <div style="min-width:0">
-          <div class="brand-title">Emerald Mail Silver v4</div>
-          <div id="titleMailbox" class="brand-subtitle">Disconnected</div>
+          <div class="brand-title">Emerald Mail V6 Firestore</div>
+          <div id="titleSubtitle" class="brand-subtitle">Accounts and SHA-256 password hashes stored in Firestore</div>
         </div>
       </div>
-      <button onclick="openSignature()">Signature</button>
+      <button id="logoutTopBtn" onclick="logout()" style="display:none">Logout</button>
     </header>
 
-    <section class="connection">
-      <div class="field">
-        <label for="apiUrl">Worker URL</label>
-        <input id="apiUrl" placeholder="https://emerald-mail-router-v2.yourname.workers.dev">
-      </div>
-      <div class="field">
-        <label for="apiKey">API Key</label>
-        <input id="apiKey" type="password" placeholder="Private Emerald Mail key">
-      </div>
-      <div class="field">
-        <label for="mailbox">Mailbox</label>
-        <input id="mailbox" placeholder="support@mail.monroecorp.org">
-      </div>
-      <div class="checkline">
-        <input id="rememberSettings" type="checkbox">
-        <label for="rememberSettings" style="margin:0;font-weight:500">Remember</label>
-      </div>
-      <div class="checkline">
-        <button onclick="loadFolder()">Connect</button>
+    <section id="loginScreen">
+      <div class="login-card">
+        <div class="login-head">
+          <h1>Sign in to Emerald Mail</h1>
+          <p>Use your email account password. Account records are stored in Firestore collection EmeraldMail.</p>
+        </div>
+        <div class="login-body">
+          <div class="login-grid">
+            <div class="login-row">
+              <label for="workerUrl">Worker URL</label>
+              <input id="workerUrl" placeholder="https://emerald-mail-router.yourname.workers.dev">
+            </div>
+            <div class="login-row">
+              <label for="loginAddress">Email Address</label>
+              <input id="loginAddress" placeholder="support@mail.monroecorp.org">
+            </div>
+            <div class="login-row">
+              <label for="loginPassword">Password</label>
+              <input id="loginPassword" type="password" placeholder="Account password">
+            </div>
+            <div class="login-row">
+              <label>&nbsp;</label>
+              <label style="font-weight:500;margin-top:8px">
+                <input id="rememberLogin" type="checkbox"> Remember Worker URL and session
+              </label>
+            </div>
+          </div>
+          <div class="login-actions">
+            <button onclick="healthCheck()">Health Check</button>
+            <button onclick="login()">Sign In</button>
+          </div>
+
+          <div class="admin-box">
+            <div class="section-title">First-time V6 Firestore setup / account creation</div>
+            <div class="admin-grid">
+              <div>
+                <label for="adminKey">Admin Key</label>
+                <input id="adminKey" type="password" placeholder="EMERALD_MAIL_ADMIN_KEY">
+              </div>
+              <div>
+                <label for="newAddress">New Account Address</label>
+                <input id="newAddress" placeholder="support@mail.monroecorp.org">
+              </div>
+              <div>
+                <label for="newDisplayName">Display Name</label>
+                <input id="newDisplayName" placeholder="Support">
+              </div>
+              <div>
+                <label for="newFromName">From Name</label>
+                <input id="newFromName" placeholder="Monroe Support">
+              </div>
+              <div>
+                <label for="newPassword">New Account Password</label>
+                <input id="newPassword" type="password" placeholder="At least 8 characters">
+              </div>
+              <div>
+                <label for="newSignature">Signature</label>
+                <input id="newSignature" placeholder="-- Monroe Corporation Support">
+              </div>
+            </div>
+            <div class="login-actions">
+              <button onclick="runSetup()">Run V6 Setup</button>
+              <button onclick="createAccount()">Create Firestore Account</button>
+              <button onclick="listAdminAccounts()">List Firestore Accounts</button>
+            </div>
+            <div id="adminOutput" class="notice" style="display:none;white-space:pre-wrap"></div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <main id="main" class="main">
-      <aside class="sidebar">
-        <div class="section">
-          <div class="section-title">Mail</div>
-          <button id="folder-inbox" class="sidebtn active" onclick="setFolder('inbox')"><span>Inbox</span><span id="count-inbox" class="count">0</span></button>
-          <button id="folder-sent" class="sidebtn" onclick="setFolder('sent')"><span>Sent</span><span id="count-sent" class="count">0</span></button>
-          <button id="folder-drafts" class="sidebtn" onclick="setFolder('drafts')"><span>Drafts</span><span id="count-drafts" class="count">0</span></button>
-          <button id="folder-trash" class="sidebtn" onclick="setFolder('trash')"><span>Trash</span><span id="count-trash" class="count">0</span></button>
+    <section id="appScreen">
+      <div class="topbar">
+        <div class="account-line">
+          <div id="accountName" class="account-name">Not signed in</div>
+          <div id="accountMeta" class="account-meta"></div>
         </div>
+        <button onclick="openCompose()">Compose</button>
+        <button onclick="loadFolder()">Refresh</button>
+        <button onclick="openSignature()">Signature</button>
+      </div>
 
-        <div class="section">
-          <div class="section-title">Actions</div>
-          <button class="sidebtn" onclick="openCompose()">New Message</button>
-          <button class="sidebtn" onclick="loadFolder()">Refresh</button>
-          <button class="sidebtn" onclick="runSetup()">Run Setup</button>
-          <button class="sidebtn" onclick="clearSavedSettings()">Clear Saved Settings</button>
-        </div>
-
-        <div class="section">
-          <div class="section-title">Support</div>
-          <div class="notice">
-            URLs are clickable in the reader. Images can be attached or inserted inline when sending is configured.
+      <main id="main" class="main">
+        <aside class="sidebar">
+          <div class="section">
+            <div class="section-title">Folders</div>
+            <button id="folder-inbox" class="sidebtn active" onclick="setFolder('inbox')"><span>Inbox</span><span id="count-inbox" class="count">0</span></button>
+            <button id="folder-sent" class="sidebtn" onclick="setFolder('sent')"><span>Sent</span><span id="count-sent" class="count">0</span></button>
+            <button id="folder-drafts" class="sidebtn" onclick="setFolder('drafts')"><span>Drafts</span><span id="count-drafts" class="count">0</span></button>
+            <button id="folder-trash" class="sidebtn" onclick="setFolder('trash')"><span>Trash</span><span id="count-trash" class="count">0</span></button>
           </div>
-        </div>
-      </aside>
 
-      <section class="list-pane">
-        <div class="listbar">
-          <input id="searchBox" placeholder="Search mail" oninput="renderMessageList()">
-          <button onclick="loadFolder()">Reload</button>
-        </div>
-        <div id="messageList" class="message-list">
-          <div class="notice" style="margin:10px">Enter Worker URL, API key, and mailbox, then press Connect.</div>
-        </div>
-      </section>
+          <div class="section">
+            <div class="section-title">Actions</div>
+            <button class="sidebtn" onclick="openCompose()">New Message</button>
+            <button class="sidebtn" onclick="loadFolder()">Refresh</button>
+            <button class="sidebtn" onclick="logout()">Logout</button>
+          </div>
 
-      <section class="viewer-pane">
-        <div class="viewerbar">
-          <button onclick="backToList()">Back</button>
-          <button onclick="openCompose()">Compose</button>
-          <button id="replyButton" onclick="replyToSelected()" disabled>Reply</button>
-          <button id="deleteButton" onclick="deleteSelectedMessage()" disabled>Move to Trash</button>
-          <button id="rawButton" onclick="toggleRawView()" disabled>Show Raw</button>
-        </div>
-        <div id="viewer" class="viewer">
-          <div class="empty">Select a message to read it.</div>
-        </div>
-      </section>
-    </main>
+          <div class="section">
+            <div class="section-title">Account</div>
+            <div id="accountBox" class="notice"></div>
+          </div>
+        </aside>
+
+        <section class="list-pane">
+          <div class="listbar">
+            <input id="searchBox" placeholder="Search mail" oninput="renderMessageList()">
+            <button onclick="loadFolder()">Reload</button>
+          </div>
+          <div id="messageList" class="message-list"></div>
+        </section>
+
+        <section class="viewer-pane">
+          <div class="viewerbar">
+            <button onclick="backToList()">Back</button>
+            <button onclick="openCompose()">Compose</button>
+            <button id="replyButton" onclick="replyToSelected()" disabled>Reply</button>
+            <button id="deleteButton" onclick="deleteSelectedMessage()" disabled>Move to Trash</button>
+            <button id="rawButton" onclick="toggleRawView()" disabled>Show Raw</button>
+          </div>
+          <div id="viewer" class="viewer">
+            <div class="empty">Select a message to read it.</div>
+          </div>
+        </section>
+      </main>
+    </section>
 
     <footer class="status">
       <div id="status" class="status-left">Ready.</div>
-      <div id="countStatus" class="status-right">0 messages</div>
+      <div id="countStatus" class="status-right">V6 Firestore</div>
     </footer>
   </div>
 </div>
@@ -279,7 +356,7 @@ label{display:block;margin-bottom:3px;font-weight:600;color:#283951}
       <button onclick="closeCompose()">Close</button>
     </div>
     <div class="dialog-body">
-      <div class="compose-row"><label>From</label><input id="composeFrom"></div>
+      <div class="compose-row"><label>From</label><input id="composeFrom" readonly></div>
       <div class="compose-row"><label>To</label><input id="composeTo"></div>
       <div class="compose-row"><label>Cc</label><input id="composeCc"></div>
       <div class="compose-row"><label>Bcc</label><input id="composeBcc"></div>
@@ -287,7 +364,7 @@ label{display:block;margin-bottom:3px;font-weight:600;color:#283951}
       <div class="compose-row">
         <label>Format</label>
         <div>
-          <label style="display:inline;font-weight:500"><input id="htmlMode" type="checkbox"> Send as HTML with clickable links</label>
+          <label style="display:inline;font-weight:500"><input id="htmlMode" type="checkbox" checked> Send HTML with clickable links</label>
           <label style="display:inline;font-weight:500;margin-left:12px"><input id="inlineImages" type="checkbox"> Insert images inline</label>
         </div>
       </div>
@@ -308,15 +385,12 @@ label{display:block;margin-bottom:3px;font-weight:600;color:#283951}
 <div id="signatureOverlay" class="overlay">
   <div class="dialog" style="height:min(430px,100%)">
     <div class="dialog-title">
-      <div>Signature</div>
+      <div>Account Signature</div>
       <button onclick="closeSignature()">Close</button>
     </div>
     <div class="dialog-body">
-      <label><input id="signatureEnabled" type="checkbox"> Automatically add this signature to new messages</label>
       <textarea id="signatureText" class="signature-box" placeholder="--
-Wyatt Monroe
-Monroe Corporation
-Emerald Systems"></textarea>
+Monroe Corporation"></textarea>
     </div>
     <div class="actions">
       <button onclick="saveSignature()">Save Signature</button>
@@ -327,6 +401,7 @@ Emerald Systems"></textarea>
 <script>
 "use strict";
 
+let currentAccount = null;
 let currentFolder = "inbox";
 let currentMessages = [];
 let selectedMessage = null;
@@ -336,17 +411,10 @@ let showingRaw = false;
 let composeAttachments = [];
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadSavedSettings();
-  loadSignatureSettings();
-  updateDraftCount();
+  loadLocalSettings();
 
-  ["apiUrl","apiKey","mailbox","rememberSettings"].forEach(id => {
-    document.getElementById(id).addEventListener("change", saveSettingsIfAllowed);
-  });
-
-  document.getElementById("mailbox").addEventListener("change", () => {
-    updateTitleMailbox();
-    updateDraftCount();
+  document.getElementById("loginPassword").addEventListener("keydown", event => {
+    if (event.key === "Enter") login();
   });
 
   document.addEventListener("keydown", event => {
@@ -355,84 +423,245 @@ document.addEventListener("DOMContentLoaded", () => {
       else if (document.getElementById("signatureOverlay").classList.contains("open")) closeSignature();
       else backToList();
     }
+
     if (event.key === "F5") {
       event.preventDefault();
-      loadFolder();
+      if (currentAccount) loadFolder();
     }
   });
 });
 
-function getApiUrl(){return document.getElementById("apiUrl").value.trim().replace(/\/$/,"")}
-function getApiKey(){return document.getElementById("apiKey").value.trim()}
-function getMailbox(){return document.getElementById("mailbox").value.trim().toLowerCase()}
+function getWorkerUrl() {
+  return document.getElementById("workerUrl").value.trim().replace(/\/$/, "");
+}
 
-function loadSavedSettings(){
-  const saved = localStorage.getItem("emerald_mail_v4_settings");
-  if (!saved) {
-    document.getElementById("mailbox").value = "support@mail.monroecorp.org";
-    updateTitleMailbox();
-    return;
+function setSessionToken(token) {
+  if (document.getElementById("rememberLogin").checked) {
+    localStorage.setItem("emerald_mail_v6_session", token);
+    sessionStorage.removeItem("emerald_mail_v6_session");
+  } else {
+    sessionStorage.setItem("emerald_mail_v6_session", token);
+    localStorage.removeItem("emerald_mail_v6_session");
   }
-  try {
-    const s = JSON.parse(saved);
-    document.getElementById("apiUrl").value = s.apiUrl || "";
-    document.getElementById("apiKey").value = s.apiKey || "";
-    document.getElementById("mailbox").value = s.mailbox || "support@mail.monroecorp.org";
-    document.getElementById("rememberSettings").checked = true;
-  } catch {}
-  updateTitleMailbox();
 }
 
-function saveSettingsIfAllowed(){
-  if (!document.getElementById("rememberSettings").checked) {
-    localStorage.removeItem("emerald_mail_v4_settings");
-    return;
+function activeToken() {
+  return sessionStorage.getItem("emerald_mail_v6_session") || localStorage.getItem("emerald_mail_v6_session") || "";
+}
+
+function saveLocalSettings() {
+  localStorage.setItem("emerald_mail_v6_worker_url", getWorkerUrl());
+  localStorage.setItem("emerald_mail_v6_remember", document.getElementById("rememberLogin").checked ? "true" : "false");
+}
+
+function loadLocalSettings() {
+  document.getElementById("workerUrl").value = localStorage.getItem("emerald_mail_v6_worker_url") || "";
+  document.getElementById("rememberLogin").checked = localStorage.getItem("emerald_mail_v6_remember") === "true";
+
+  const token = activeToken();
+  if (token && getWorkerUrl()) {
+    checkSession();
   }
-  localStorage.setItem("emerald_mail_v4_settings", JSON.stringify({
-    apiUrl:getApiUrl(),
-    apiKey:getApiKey(),
-    mailbox:getMailbox()
-  }));
-  updateTitleMailbox();
 }
 
-function clearSavedSettings(){
-  localStorage.removeItem("emerald_mail_v4_settings");
-  document.getElementById("rememberSettings").checked = false;
-  setStatus("Saved settings cleared.");
-}
+async function api(path, options = {}) {
+  const url = getWorkerUrl();
 
-function updateTitleMailbox(){
-  document.getElementById("titleMailbox").textContent = getMailbox() || "Disconnected";
-}
+  if (!url) {
+    throw new Error("Missing Worker URL.");
+  }
 
-async function api(path, options = {}){
-  if (!getApiUrl()) throw new Error("Missing Worker URL.");
-  if (!getApiKey()) throw new Error("Missing API key.");
-  return fetch(getApiUrl() + path, {
+  const token = activeToken();
+
+  return fetch(url + path, {
     ...options,
-    headers:{
-      "Authorization":"Bearer " + getApiKey(),
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? {"Authorization":"Bearer " + token} : {}),
+      ...(options.headers || {})
+    }
+  });
+}
+
+async function adminApi(path, options = {}) {
+  const url = getWorkerUrl();
+  const adminKey = document.getElementById("adminKey").value.trim();
+
+  if (!url) throw new Error("Missing Worker URL.");
+  if (!adminKey) throw new Error("Missing admin key.");
+
+  const separator = path.includes("?") ? "&" : "?";
+
+  return fetch(url + path + separator + "admin_key=" + encodeURIComponent(adminKey), {
+    ...options,
+    headers: {
       "Content-Type":"application/json",
       ...(options.headers || {})
     }
   });
 }
 
-async function runSetup(){
-  try{
-    setStatus("Running setup...");
-    const res = await api("/api/setup");
+async function healthCheck() {
+  try {
+    saveLocalSettings();
+    const res = await fetch(getWorkerUrl() + "/api/health");
     const data = await res.json();
-    if (!data.ok) throw new Error(data.error || "Setup failed.");
-    setStatus("Setup complete.", false, true);
-  }catch(e){setStatus(e.message,true)}
+    setStatus(data.ok ? "Health check passed." : "Health check failed.", !data.ok, data.ok);
+    showAdminOutput(data);
+  } catch (error) {
+    setStatus(error.message, true);
+  }
 }
 
-async function loadFolder(){
-  saveSettingsIfAllowed();
-  updateTitleMailbox();
+async function runSetup() {
+  try {
+    saveLocalSettings();
+    setStatus("Running V6 Firestore setup...");
+    const res = await adminApi("/api/setup");
+    const data = await res.json();
+    showAdminOutput(data);
+    if (!data.ok) throw new Error(data.error || "Setup failed.");
+    setStatus("V6 Firestore setup complete.", false, true);
+  } catch (error) {
+    setStatus(error.message, true);
+  }
+}
+
+async function createAccount() {
+  try {
+    saveLocalSettings();
+
+    const body = {
+      address: document.getElementById("newAddress").value.trim(),
+      display_name: document.getElementById("newDisplayName").value.trim(),
+      from_name: document.getElementById("newFromName").value.trim(),
+      password: document.getElementById("newPassword").value,
+      signature: document.getElementById("newSignature").value,
+      can_send: 1,
+      can_receive: 1,
+      is_admin: 0
+    };
+
+    const res = await adminApi("/api/admin/accounts/create", {
+      method: "POST",
+      body: JSON.stringify(body)
+    });
+
+    const data = await res.json();
+    showAdminOutput(data);
+    if (!data.ok) throw new Error(data.error || "Account creation failed.");
+    setStatus("Firestore account created.", false, true);
+  } catch (error) {
+    setStatus(error.message, true);
+  }
+}
+
+async function listAdminAccounts() {
+  try {
+    const res = await adminApi("/api/admin/accounts");
+    const data = await res.json();
+    showAdminOutput(data);
+    if (!data.ok) throw new Error(data.error || "Could not list accounts.");
+    setStatus("Firestore accounts loaded.", false, true);
+  } catch (error) {
+    setStatus(error.message, true);
+  }
+}
+
+function showAdminOutput(data) {
+  const box = document.getElementById("adminOutput");
+  box.style.display = "block";
+  box.textContent = JSON.stringify(data, null, 2);
+}
+
+async function login() {
+  try {
+    saveLocalSettings();
+    setStatus("Signing in...");
+
+    const res = await fetch(getWorkerUrl() + "/api/auth/login", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        address: document.getElementById("loginAddress").value.trim(),
+        password: document.getElementById("loginPassword").value
+      })
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      throw new Error(data.error || "Login failed.");
+    }
+
+    setSessionToken(data.token);
+    currentAccount = data.account;
+    showApp();
+    setStatus("Signed in.", false, true);
+    loadFolder();
+  } catch (error) {
+    setStatus(error.message, true);
+  }
+}
+
+async function checkSession() {
+  try {
+    const res = await api("/api/auth/me");
+    const data = await res.json();
+
+    if (!data.ok) {
+      throw new Error(data.error || "Session expired.");
+    }
+
+    currentAccount = data.account;
+    showApp();
+    loadFolder();
+  } catch {
+    sessionStorage.removeItem("emerald_mail_v6_session");
+    localStorage.removeItem("emerald_mail_v6_session");
+  }
+}
+
+async function logout() {
+  try {
+    await api("/api/auth/logout", {method:"POST", body:"{}"});
+  } catch {}
+
+  sessionStorage.removeItem("emerald_mail_v6_session");
+  localStorage.removeItem("emerald_mail_v6_session");
+  currentAccount = null;
+  selectedMessage = null;
+  currentMessages = [];
+  document.getElementById("appScreen").style.display = "none";
+  document.getElementById("loginScreen").style.display = "grid";
+  document.getElementById("logoutTopBtn").style.display = "none";
+  document.getElementById("titleSubtitle").textContent = "Accounts and SHA-256 password hashes stored in Firestore";
+  setStatus("Signed out.");
+}
+
+function showApp() {
+  document.getElementById("loginScreen").style.display = "none";
+  document.getElementById("appScreen").style.display = "flex";
+  document.getElementById("logoutTopBtn").style.display = "inline-block";
+
+  const label = currentAccount.display_name + " <" + currentAccount.address + ">";
+  document.getElementById("accountName").textContent = label;
+  document.getElementById("accountMeta").textContent = currentAccount.can_send ? "Sending enabled through Resend" : "Sending disabled";
+  document.getElementById("titleSubtitle").textContent = label;
+  document.getElementById("accountBox").textContent =
+    "Address: " + currentAccount.address +
+    "\nFrom name: " + currentAccount.from_name +
+    "\nCan send: " + (currentAccount.can_send ? "Yes" : "No") +
+    "\nCan receive: " + (currentAccount.can_receive ? "Yes" : "No") +
+    "\nPassword source: Firestore / EmeraldMail";
+
+  updateDraftCount();
+}
+
+async function loadFolder() {
   clearViewer(false);
+
+  if (!currentAccount) return;
 
   if (currentFolder === "drafts") {
     currentMessages = getDrafts();
@@ -441,23 +670,26 @@ async function loadFolder(){
     return;
   }
 
-  try{
+  try {
     setStatus("Loading " + currentFolder + "...");
-    const path = "/api/messages?mailbox=" + encodeURIComponent(getMailbox()) + "&folder=" + encodeURIComponent(currentFolder);
-    const res = await api(path);
+    const res = await api("/api/messages?folder=" + encodeURIComponent(currentFolder));
     const data = await res.json();
-    if (!data.ok) throw new Error(data.error || "Could not load folder.");
+
+    if (!data.ok) {
+      throw new Error(data.error || "Could not load folder.");
+    }
+
     currentMessages = data.messages || [];
     renderMessageList();
     setStatus("Loaded " + currentFolder + ".");
-  }catch(e){
+  } catch (error) {
     currentMessages = [];
     renderMessageList();
-    setStatus(e.message,true);
+    setStatus(error.message, true);
   }
 }
 
-function setFolder(folder){
+function setFolder(folder) {
   currentFolder = folder;
   document.querySelectorAll(".sidebtn").forEach(b => b.classList.remove("active"));
   const btn = document.getElementById("folder-" + folder);
@@ -465,14 +697,14 @@ function setFolder(folder){
   loadFolder();
 }
 
-function renderMessageList(keepSelection = true){
+function renderMessageList(keepSelection = true) {
   const list = document.getElementById("messageList");
   const q = document.getElementById("searchBox").value.trim().toLowerCase();
   let messages = currentMessages;
 
   if (q) {
     messages = messages.filter(m => [
-      m.subject,m.sender,m.recipient,m.text_preview,m.received_at
+      m.subject, m.sender, m.recipient, m.text_preview, m.received_at
     ].join(" ").toLowerCase().includes(q));
   }
 
@@ -510,7 +742,7 @@ function renderMessageList(keepSelection = true){
     date.className = "date";
     date.textContent = formatDate(m.received_at);
 
-    card.append(subj,meta);
+    card.append(subj, meta);
     if (prev.textContent) card.append(prev);
     card.append(date);
 
@@ -523,12 +755,14 @@ function renderMessageList(keepSelection = true){
   updateFolderCounts(messages.length);
 }
 
-function updateFolderCounts(count){
+function updateFolderCounts(count) {
   const target = document.getElementById("count-" + currentFolder);
-  if (target && currentFolder !== "drafts") target.textContent = typeof count === "number" ? count : currentMessages.length;
+  if (target && currentFolder !== "drafts") {
+    target.textContent = typeof count === "number" ? count : currentMessages.length;
+  }
 }
 
-async function openMessage(id){
+async function openMessage(id) {
   const msg = currentMessages.find(m => m.id === id);
   if (!msg) return;
 
@@ -544,7 +778,6 @@ async function openMessage(id){
   if (currentFolder === "drafts") {
     openCompose({
       title:"Edit Draft",
-      from:msg.sender || getMailbox(),
       to:msg.recipient || "",
       cc:msg.cc || "",
       bcc:msg.bcc || "",
@@ -556,27 +789,27 @@ async function openMessage(id){
 
   document.getElementById("viewer").innerHTML = "<div class='empty'>Loading message...</div>";
 
-  try{
+  try {
     const res = await api("/api/message/raw?id=" + encodeURIComponent(id));
     selectedRaw = await res.text();
     selectedParsed = parseRawEmail(selectedRaw, msg);
     renderParsedMessage(selectedParsed);
 
     if (currentFolder === "inbox") {
-      await api("/api/message/read", {method:"POST",body:JSON.stringify({id})});
+      await api("/api/message/read", {method:"POST", body:JSON.stringify({id})});
       msg.read = 1;
       renderMessageList(false);
       markSelectedCard(id);
     }
 
     setStatus("Message opened.");
-  }catch(e){
-    document.getElementById("viewer").innerHTML = "<div class='notice error'>" + escapeHtml(e.message) + "</div>";
-    setStatus(e.message,true);
+  } catch (error) {
+    document.getElementById("viewer").innerHTML = "<div class='notice error'>" + escapeHtml(error.message) + "</div>";
+    setStatus(error.message, true);
   }
 }
 
-function renderParsedMessage(parsed){
+function renderParsedMessage(parsed) {
   const viewer = document.getElementById("viewer");
   viewer.innerHTML = "";
 
@@ -596,12 +829,12 @@ function renderParsedMessage(parsed){
   body.className = "body";
   body.innerHTML = linkifyAndEscape(parsed.body || "No readable body found.");
 
-  paper.append(head,body);
+  paper.append(head, body);
   viewer.appendChild(paper);
   document.getElementById("rawButton").textContent = "Show Raw";
 }
 
-function renderRaw(){
+function renderRaw() {
   const viewer = document.getElementById("viewer");
   viewer.innerHTML = "";
   const raw = document.createElement("div");
@@ -611,14 +844,14 @@ function renderRaw(){
   document.getElementById("rawButton").textContent = "Show Parsed";
 }
 
-function headerRow(label,value){
+function headerRow(label, value) {
   const row = document.createElement("div");
   row.className = "row";
   row.innerHTML = "<b>" + escapeHtml(label) + ":</b> " + escapeHtml(value || "");
   return row;
 }
 
-async function deleteSelectedMessage(){
+async function deleteSelectedMessage() {
   if (!selectedMessage) return;
 
   if (currentFolder === "drafts") {
@@ -630,14 +863,16 @@ async function deleteSelectedMessage(){
 
   if (!confirm("Move this message to Trash?\n\n" + (selectedMessage.subject || "(No subject)"))) return;
 
-  try{
-    await api("/api/message/delete", {method:"POST",body:JSON.stringify({id:selectedMessage.id})});
+  try {
+    await api("/api/message/delete", {method:"POST", body:JSON.stringify({id:selectedMessage.id})});
     setStatus("Message moved to Trash.");
     await loadFolder();
-  }catch(e){setStatus(e.message,true)}
+  } catch (error) {
+    setStatus(error.message, true);
+  }
 }
 
-function clearViewer(setReady = true){
+function clearViewer(setReady = true) {
   selectedMessage = null;
   selectedRaw = "";
   selectedParsed = null;
@@ -648,31 +883,33 @@ function clearViewer(setReady = true){
   if (setReady) setStatus("Viewer cleared.");
 }
 
-function enableButtons(enabled){
+function enableButtons(enabled) {
   document.getElementById("deleteButton").disabled = !enabled;
   document.getElementById("replyButton").disabled = !enabled || currentFolder === "sent" || currentFolder === "drafts";
   document.getElementById("rawButton").disabled = !enabled || !selectedRaw;
 }
 
-function markSelectedCard(id){
+function markSelectedCard(id) {
   document.querySelectorAll(".card").forEach(c => c.classList.toggle("selected", c.dataset.id === id));
 }
 
-function toggleRawView(){
+function toggleRawView() {
   if (!selectedMessage || !selectedRaw) return;
   showingRaw = !showingRaw;
   showingRaw ? renderRaw() : renderParsedMessage(selectedParsed || parseRawEmail(selectedRaw, selectedMessage));
 }
 
-function showMobileViewer(){document.getElementById("main").classList.add("show-viewer")}
-function backToList(){document.getElementById("main").classList.remove("show-viewer")}
+function showMobileViewer() { document.getElementById("main").classList.add("show-viewer"); }
+function backToList() { document.getElementById("main").classList.remove("show-viewer"); }
 
-function openCompose(prefill = {}){
+function openCompose(prefill = {}) {
+  if (!currentAccount) return;
+
   composeAttachments = [];
   renderAttachmentList();
 
   document.getElementById("composeTitle").textContent = prefill.title || "New Message";
-  document.getElementById("composeFrom").value = prefill.from || getMailbox();
+  document.getElementById("composeFrom").value = (currentAccount.from_name || "Emerald Mail") + " <" + currentAccount.address + ">";
   document.getElementById("composeTo").value = prefill.to || "";
   document.getElementById("composeCc").value = prefill.cc || "";
   document.getElementById("composeBcc").value = prefill.bcc || "";
@@ -681,25 +918,33 @@ function openCompose(prefill = {}){
   document.getElementById("inlineImages").checked = false;
 
   let text = prefill.text || "";
-  if (!text && signatureEnabled()) {
-    text = "\n\n" + getSignature();
+
+  if (!text && currentAccount.signature) {
+    text = "\n\n" + currentAccount.signature;
   }
 
   document.getElementById("composeText").value = text;
   document.getElementById("composeOverlay").classList.add("open");
 }
 
-function closeCompose(){document.getElementById("composeOverlay").classList.remove("open")}
+function closeCompose() {
+  document.getElementById("composeOverlay").classList.remove("open");
+}
 
-function replyToSelected(){
+function replyToSelected() {
   if (!selectedMessage) return;
+
   const parsed = selectedParsed || parseRawEmail(selectedRaw, selectedMessage);
   const subject = (selectedMessage.subject || "").toLowerCase().startsWith("re:")
     ? selectedMessage.subject
     : "Re: " + (selectedMessage.subject || "(No subject)");
 
   let quote = "\n\n";
-  if (signatureEnabled()) quote += getSignature() + "\n\n";
+
+  if (currentAccount.signature) {
+    quote += currentAccount.signature + "\n\n";
+  }
+
   quote += "----- Original Message -----\n";
   quote += "From: " + (parsed.from || selectedMessage.sender || "") + "\n";
   quote += "Date: " + (parsed.date || formatDate(selectedMessage.received_at)) + "\n\n";
@@ -707,14 +952,13 @@ function replyToSelected(){
 
   openCompose({
     title:"Reply",
-    from:getMailbox(),
     to:selectedMessage.sender || parsed.from || "",
     subject,
     text:quote
   });
 }
 
-function getComposePayload(){
+function getComposePayload() {
   const text = document.getElementById("composeText").value;
   const htmlMode = document.getElementById("htmlMode").checked;
   const headers = {};
@@ -726,8 +970,10 @@ function getComposePayload(){
   }
 
   let html = "";
+
   if (htmlMode) {
     html = textToHtml(text);
+
     if (document.getElementById("inlineImages").checked) {
       for (const file of composeAttachments) {
         if (file.disposition === "inline" && file.content_id) {
@@ -738,43 +984,56 @@ function getComposePayload(){
   }
 
   return {
-    from:document.getElementById("composeFrom").value.trim().toLowerCase(),
-    to:document.getElementById("composeTo").value.trim(),
-    cc:document.getElementById("composeCc").value.trim(),
-    bcc:document.getElementById("composeBcc").value.trim(),
-    subject:document.getElementById("composeSubject").value.trim(),
+    to: document.getElementById("composeTo").value.trim(),
+    cc: document.getElementById("composeCc").value.trim(),
+    bcc: document.getElementById("composeBcc").value.trim(),
+    subject: document.getElementById("composeSubject").value.trim(),
     text,
     html,
     headers,
-    attachments:composeAttachments
+    attachments: composeAttachments
   };
 }
 
-async function sendComposedMessage(){
+async function sendComposedMessage() {
   const payload = getComposePayload();
-  if (!payload.from || !payload.to || !payload.subject || !payload.text.trim()) {
-    setStatus("From, To, Subject, and body are required.", true);
+
+  if (!payload.to || !payload.subject || !payload.text.trim()) {
+    setStatus("To, subject, and body are required.", true);
     return;
   }
 
-  try{
+  try {
     setStatus("Sending message...");
-    const res = await api("/api/send", {method:"POST",body:JSON.stringify(payload)});
+    const res = await api("/api/send", {
+      method:"POST",
+      body:JSON.stringify(payload)
+    });
+
     const data = await res.json().catch(() => ({}));
-    if (!res.ok || data.ok === false) throw new Error(data.error || "Send failed.");
+
+    if (!res.ok || data.ok === false) {
+      throw new Error(data.error || "Send failed.");
+    }
+
     closeCompose();
     setStatus("Message sent.", false, true);
-    if (currentFolder === "sent") loadFolder();
-  }catch(e){setStatus(e.message,true)}
+
+    if (currentFolder === "sent") {
+      loadFolder();
+    }
+  } catch (error) {
+    setStatus(error.message, true);
+  }
 }
 
-function saveDraft(){
+function saveDraft() {
   const p = getComposePayload();
   const drafts = getDrafts();
+
   drafts.unshift({
-    id:crypto.randomUUID(),
+    id: crypto.randomUUID(),
     folder:"drafts",
-    sender:p.from,
     recipient:p.to,
     cc:p.cc,
     bcc:p.bcc,
@@ -784,17 +1043,20 @@ function saveDraft(){
     received_at:new Date().toISOString(),
     read:1
   });
+
   saveDrafts(drafts);
   updateDraftCount();
   setStatus("Draft saved.");
 }
 
-async function handleAttachmentPick(event){
+async function handleAttachmentPick(event) {
   const files = Array.from(event.target.files || []);
+
   for (const file of files) {
     const base64 = await fileToBase64(file);
     const isImage = file.type.startsWith("image/");
     const cid = isImage ? "img-" + crypto.randomUUID() : "";
+
     composeAttachments.push({
       filename:file.name,
       type:file.type || "application/octet-stream",
@@ -804,14 +1066,16 @@ async function handleAttachmentPick(event){
       preview:isImage ? URL.createObjectURL(file) : ""
     });
   }
+
   renderAttachmentList();
   event.target.value = "";
 }
 
-function renderAttachmentList(){
+function renderAttachmentList() {
   const list = document.getElementById("attachmentList");
   list.innerHTML = "";
-  composeAttachments.forEach((a,index) => {
+
+  composeAttachments.forEach((a, index) => {
     const item = document.createElement("div");
     item.className = "attach-item";
 
@@ -855,7 +1119,7 @@ function renderAttachmentList(){
   });
 }
 
-function fileToBase64(file){
+function fileToBase64(file) {
   return new Promise((resolve,reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result).split(",")[1] || "");
@@ -864,38 +1128,64 @@ function fileToBase64(file){
   });
 }
 
-function getDraftKey(){return "emerald_mail_v4_drafts_" + getMailbox()}
-function getDrafts(){try{return JSON.parse(localStorage.getItem(getDraftKey()) || "[]")}catch{return[]}}
-function saveDrafts(drafts){localStorage.setItem(getDraftKey(), JSON.stringify(drafts))}
-function updateDraftCount(){document.getElementById("count-drafts").textContent = getDrafts().length}
+function getDraftKey() {
+  return "emerald_mail_v6_drafts_" + (currentAccount ? currentAccount.address : "unknown");
+}
 
-function openSignature(){
-  loadSignatureSettings();
+function getDrafts() {
+  try { return JSON.parse(localStorage.getItem(getDraftKey()) || "[]"); }
+  catch { return []; }
+}
+
+function saveDrafts(drafts) {
+  localStorage.setItem(getDraftKey(), JSON.stringify(drafts));
+}
+
+function updateDraftCount() {
+  document.getElementById("count-drafts").textContent = getDrafts().length;
+}
+
+function openSignature() {
+  if (!currentAccount) return;
+  document.getElementById("signatureText").value = currentAccount.signature || "";
   document.getElementById("signatureOverlay").classList.add("open");
 }
-function closeSignature(){document.getElementById("signatureOverlay").classList.remove("open")}
-function getSignature(){return localStorage.getItem("emerald_mail_v4_signature") || ""}
-function signatureEnabled(){return localStorage.getItem("emerald_mail_v4_signature_enabled") === "true"}
-function loadSignatureSettings(){
-  document.getElementById("signatureText").value = getSignature();
-  document.getElementById("signatureEnabled").checked = signatureEnabled();
-}
-function saveSignature(){
-  localStorage.setItem("emerald_mail_v4_signature", document.getElementById("signatureText").value);
-  localStorage.setItem("emerald_mail_v4_signature_enabled", document.getElementById("signatureEnabled").checked ? "true" : "false");
-  closeSignature();
-  setStatus("Signature saved.");
+
+function closeSignature() {
+  document.getElementById("signatureOverlay").classList.remove("open");
 }
 
-function parseRawEmail(raw,fallback){
+async function saveSignature() {
+  try {
+    const signature = document.getElementById("signatureText").value;
+    const res = await api("/api/account/signature", {
+      method:"POST",
+      body:JSON.stringify({signature})
+    });
+    const data = await res.json();
+
+    if (!data.ok) {
+      throw new Error(data.error || "Could not save signature.");
+    }
+
+    currentAccount.signature = signature;
+    closeSignature();
+    setStatus("Signature saved to Firestore.", false, true);
+  } catch (error) {
+    setStatus(error.message, true);
+  }
+}
+
+function parseRawEmail(raw, fallback) {
   const normalized = String(raw || "").replace(/\r\n/g,"\n");
   const split = normalized.indexOf("\n\n");
-  const headerText = split >= 0 ? normalized.slice(0,split) : "";
-  const bodyText = split >= 0 ? normalized.slice(split+2) : normalized;
+  const headerText = split >= 0 ? normalized.slice(0, split) : "";
+  const bodyText = split >= 0 ? normalized.slice(split + 2) : normalized;
   const headers = parseHeaders(headerText);
   const ct = (headers["content-type"] || "").toLowerCase();
 
   let body = "";
+
   if (ct.includes("multipart/")) body = extractTextFromMultipart(bodyText, headers["content-type"]);
   else body = decodeMaybeQuotedPrintable(bodyText);
 
@@ -908,56 +1198,76 @@ function parseRawEmail(raw,fallback){
   };
 }
 
-function parseHeaders(headerText){
+function parseHeaders(headerText) {
   const headers = {};
   let key = "";
+
   for (const line of String(headerText || "").split("\n")) {
-    if (/^\s/.test(line) && key) { headers[key] += " " + line.trim(); continue; }
+    if (/^\s/.test(line) && key) {
+      headers[key] += " " + line.trim();
+      continue;
+    }
+
     const i = line.indexOf(":");
     if (i === -1) continue;
+
     key = line.slice(0,i).trim().toLowerCase();
     headers[key] = line.slice(i+1).trim();
   }
+
   return headers;
 }
 
-function extractTextFromMultipart(bodyText,ct){
+function extractTextFromMultipart(bodyText, ct) {
   const m = /boundary="?([^";]+)"?/i.exec(ct || "");
   if (!m) return decodeMaybeQuotedPrintable(bodyText);
+
   const parts = bodyText.split("--" + m[1]);
-  let plain = "", html = "";
+  let plain = "";
+  let html = "";
+
   for (const part of parts) {
     const trimmed = part.trim();
     if (!trimmed || trimmed === "--") continue;
+
     const split = trimmed.indexOf("\n\n");
-    const ph = parseHeaders(split >= 0 ? trimmed.slice(0,split) : "");
-    const pb = split >= 0 ? trimmed.slice(split+2) : trimmed;
+    const ph = parseHeaders(split >= 0 ? trimmed.slice(0, split) : "");
+    const pb = split >= 0 ? trimmed.slice(split + 2) : trimmed;
     const type = (ph["content-type"] || "").toLowerCase();
     const enc = (ph["content-transfer-encoding"] || "").toLowerCase();
     let decoded = enc.includes("quoted-printable") ? decodeQuotedPrintable(pb) : pb;
+
     if (type.includes("text/plain") && !plain) plain = decoded;
     if (type.includes("text/html") && !html) html = htmlToText(decoded);
   }
+
   return plain || html || decodeMaybeQuotedPrintable(bodyText);
 }
 
-function decodeMaybeQuotedPrintable(v){
+function decodeMaybeQuotedPrintable(v) {
   const t = String(v || "");
   if (t.includes("=0A") || t.includes("=0D") || /=\n/.test(t) || /=[A-Fa-f0-9]{2}/.test(t)) return decodeQuotedPrintable(t);
   return t;
 }
-function decodeQuotedPrintable(input){
-  try{
-    return String(input || "").replace(/=\n/g,"").replace(/=([A-Fa-f0-9]{2})/g,(_,h)=>String.fromCharCode(parseInt(h,16)));
-  }catch{return String(input || "")}
+
+function decodeQuotedPrintable(input) {
+  try {
+    return String(input || "")
+      .replace(/=\n/g,"")
+      .replace(/=([A-Fa-f0-9]{2})/g,(_,h)=>String.fromCharCode(parseInt(h,16)));
+  } catch {
+    return String(input || "");
+  }
 }
-function decodeMimeHeader(v){
+
+function decodeMimeHeader(v) {
   return String(v || "").replace(/=\?([^?]+)\?([BQbq])\?([^?]+)\?=/g,(_,charset,enc,data)=>{
-    try{return enc.toUpperCase()==="B" ? atob(data) : decodeQuotedPrintable(data.replace(/_/g," "))}
-    catch{return data}
+    try { return enc.toUpperCase() === "B" ? atob(data) : decodeQuotedPrintable(data.replace(/_/g," ")); }
+    catch { return data; }
   });
 }
-function htmlToText(html){
+
+function htmlToText(html) {
   const clean = String(html || "")
     .replace(/<script[\s\S]*?<\/script>/gi,"")
     .replace(/<style[\s\S]*?<\/style>/gi,"")
@@ -965,13 +1275,17 @@ function htmlToText(html){
     .replace(/<\/p>/gi,"\n\n")
     .replace(/<\/div>/gi,"\n")
     .replace(/<[^>]+>/g,"");
+
   const textarea = document.createElement("textarea");
   textarea.innerHTML = clean;
   return textarea.value;
 }
-function cleanupBody(body){return String(body || "").replace(/\n{4,}/g,"\n\n\n").trim()}
 
-function escapeHtml(value){
+function cleanupBody(body) {
+  return String(body || "").replace(/\n{4,}/g,"\n\n\n").trim();
+}
+
+function escapeHtml(value) {
   return String(value || "")
     .replaceAll("&","&amp;")
     .replaceAll("<","&lt;")
@@ -979,27 +1293,34 @@ function escapeHtml(value){
     .replaceAll('"',"&quot;")
     .replaceAll("'","&#039;");
 }
-function linkifyAndEscape(text){
+
+function linkifyAndEscape(text) {
   return escapeHtml(text).replace(/(https?:\/\/[^\s<>"']+)/g, url => {
     const clean = url.replace(/[),.;!?]+$/,"");
     const tail = url.slice(clean.length);
     return `<a href="${clean}" target="_blank" rel="noopener noreferrer">${clean}</a>${escapeHtml(tail)}`;
   });
 }
-function textToHtml(text){
+
+function textToHtml(text) {
   return "<div>" + linkifyAndEscape(text).replace(/\n/g,"<br>") + "</div>";
 }
-function formatDate(value){
+
+function formatDate(value) {
   const d = new Date(value);
   return Number.isNaN(d.getTime()) ? String(value || "") : d.toLocaleString();
 }
-function setStatus(text,isError=false,isSuccess=false){
+
+function setStatus(text, isError=false, isSuccess=false) {
   const s = document.getElementById("status");
   s.textContent = text;
-  s.classList.toggle("error",isError);
-  s.classList.toggle("success",isSuccess);
+  s.classList.toggle("error", isError);
+  s.classList.toggle("success", isSuccess);
 }
-function setCountStatus(text){document.getElementById("countStatus").textContent = text}
+
+function setCountStatus(text) {
+  document.getElementById("countStatus").textContent = text;
+}
 </script>
 </body>
 </html>
