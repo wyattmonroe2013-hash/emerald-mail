@@ -4,121 +4,232 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Emerald Mail</title>
-
 <style>
 :root{
-  --bg1:#eaf0f9;
-  --bg2:#9eacc4;
-  --panel:#eef4fc;
-  --glass:rgba(245,249,255,.88);
-  --line:#8291a8;
-  --line2:#b8c4d3;
-  --text:#132033;
-  --muted:#63728a;
-  --blue1:#5e96d9;
-  --blue2:#1d5aa6;
-  --danger:#8b1e1e;
-  --success:#1f6b39;
-  --paper:#fff;
+  --bg:#dde5ed;
+  --panel:#f6f8fb;
+  --panel-2:#ffffff;
+  --line:#d9e0e8;
+  --line-2:#c8d1db;
+  --text:#233244;
+  --muted:#6d7d90;
+  --green:#149a6a;
+  --green-2:#0c7b54;
+  --green-soft:#eaf6f0;
+  --danger:#b54545;
+  --shadow:0 8px 24px rgba(28,47,71,.12);
 }
-
 *{box-sizing:border-box}
-html,body{height:100%;margin:0;overflow:hidden}
+html,body{margin:0;height:100%;overflow:hidden}
 body{
   font-family:"Segoe UI",Tahoma,Arial,sans-serif;
-  font-size:13px;
+  font-size:14px;
   color:var(--text);
-  background:
-    radial-gradient(circle at 20% 0%,rgba(255,255,255,.96),transparent 35%),
-    linear-gradient(135deg,var(--bg1),var(--bg2));
+  background:linear-gradient(180deg,#d5dee7,#e6edf4);
 }
-
-button,input,textarea{font-family:inherit;font-size:13px}
-button{
-  min-height:28px;
-  padding:4px 12px;
-  border:1px solid #6f7e92;
-  border-radius:5px;
-  color:#182941;
-  background:linear-gradient(#fff,#e9eff7 45%,#c8d5e6 46%,#edf4fb);
-  box-shadow:inset 0 1px rgba(255,255,255,.95),0 1px 2px rgba(0,0,0,.16);
-  cursor:pointer;
-}
-button:hover{border-color:#2c76be;background:linear-gradient(#fff,#edf7ff 45%,#bedcff 46%,#f0f8ff)}
-button:active,button.active{color:#fff;border-color:#164b83;background:linear-gradient(var(--blue1),var(--blue2))}
-button:disabled{color:#7d8795;cursor:default;background:linear-gradient(#f4f4f4,#d7dce4)}
-
-input,textarea{
-  border:1px solid #75859b;
-  border-radius:5px;
-  background:#fff;
-  color:#111827;
-  padding:6px 8px;
-  box-shadow:inset 0 1px 3px rgba(0,0,0,.18),0 1px rgba(255,255,255,.8);
-}
-textarea{resize:none}
-label{display:block;margin-bottom:3px;font-weight:600;color:#283951}
-
+button,input,textarea{font-family:inherit;font-size:14px}
+button{cursor:pointer}
+img{max-width:100%}
 .shell{height:100vh;padding:0}
-.window{
-  height:100%;
-  width:100%;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-  border:1px solid rgba(56,70,93,.8);
-  border-radius:0;
-  background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(225,233,246,.8));
-  box-shadow:0 18px 44px rgba(36,50,75,.35),inset 0 1px rgba(255,255,255,.95);
-  backdrop-filter:blur(12px);
-}
-.titlebar{
-  min-height:44px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding:8px 12px;
-  border-bottom:1px solid var(--line);
-  background:linear-gradient(#fff,#d4dfef 48%,#91a5c2);
-}
-.brand{display:flex;align-items:center;gap:10px;min-width:0}
-.logo{
-  width:30px;height:30px;border-radius:7px;
-  display:grid;place-items:center;
-  color:#fff;font-size:10px;font-weight:800;
-  background:linear-gradient(135deg,#2f7bd5,#173f75);
-  box-shadow:inset 0 1px rgba(255,255,255,.55),0 1px 3px rgba(0,0,0,.3)
-}
-.brand-title{font-size:16px;font-weight:700}
-.brand-subtitle{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.brand-wrap{display:flex;align-items:center;gap:12px;min-width:0}
-.header-logo{height:34px;width:auto;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.12))}
-.hero-logo{max-width:280px;width:100%;height:auto;display:block;margin:0 auto 14px auto;filter:drop-shadow(0 4px 10px rgba(0,0,0,.12))}
-.login-head{text-align:center}
-.login-head p{max-width:560px;margin:0 auto;color:var(--muted)}
-.window{border:none;box-shadow:none}
-.titlebar{min-height:56px;padding:10px 14px;background:linear-gradient(#fcfdff,#dce6f3 48%,#a6b7cf)}
-.topbar{padding:12px;background:rgba(240,244,250,.96)}
-.sidebar{background:linear-gradient(180deg,rgba(242,246,251,.96),rgba(230,236,246,.96))}
-.list-pane{background:rgba(252,253,255,.95)}
-.viewer{background:linear-gradient(rgba(255,255,255,.92),rgba(246,249,253,.92))}
-.login-card{border:1px solid #9daec4; box-shadow:0 18px 44px rgba(36,50,75,.22), inset 0 1px rgba(255,255,255,.96)}
+.window{height:100%;width:100%;display:flex;flex-direction:column;background:linear-gradient(180deg,#f7fafc,#eef3f8)}
 
+.app-header{
+  height:76px;display:flex;align-items:center;gap:18px;padding:14px 18px;
+  border-bottom:1px solid var(--line-2);
+  background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(233,239,245,.98));
+  box-shadow:inset 0 1px rgba(255,255,255,.9);
+}
+.brand-wrap{display:flex;align-items:center;gap:14px;min-width:270px}
+.brand-logo{width:58px;height:58px;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(0,0,0,.12))}
+.brand-text{display:flex;flex-direction:column;min-width:0}
+.brand-title{font-size:24px;font-weight:700;letter-spacing:-.3px;color:#158f63}
+.brand-title span{color:#516173;font-weight:500}
+.brand-subtitle{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.header-actions{display:flex;align-items:center;gap:14px;flex:1;min-width:0}
+.compose-main{
+  height:48px;min-width:184px;padding:0 22px;border:none;border-radius:18px;
+  color:#fff;font-weight:700;background:linear-gradient(180deg,var(--green),var(--green-2));
+  box-shadow:0 8px 18px rgba(20,154,106,.22);
+}
+.header-btn{
+  height:48px;padding:0 22px;border:1px solid #d5dce4;border-radius:18px;
+  background:linear-gradient(180deg,#ffffff,#eef2f7);color:#445568;
+}
+.search-wrap{display:flex;align-items:center;flex:1;min-width:160px;height:48px;border:1px solid #d5dce4;border-radius:24px;background:#fff;overflow:hidden}
+.search-wrap input{border:none;outline:none;flex:1;height:100%;padding:0 18px;background:transparent}
+.search-btn{width:58px;height:100%;border:none;background:transparent;color:#4f6073;font-size:18px}
+.header-right{display:flex;align-items:center;gap:16px;margin-left:auto}
+.icon-circle{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;border:1px solid #d5dce4;background:#fff;color:#4d5f74;font-weight:700}
+.profile-chip{display:flex;align-items:center;gap:10px;padding:6px 10px;border-left:1px solid var(--line)}
+.profile-avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.profile-meta{display:flex;flex-direction:column;line-height:1.15}
+.profile-name{font-weight:700}
+.profile-sub{font-size:12px;color:var(--muted)}
+
+#loginScreen{flex:1;display:grid;place-items:center;padding:28px;overflow:auto}
+.login-card{width:min(980px,100%);background:rgba(255,255,255,.92);border:1px solid #d5dce4;border-radius:26px;box-shadow:var(--shadow);overflow:hidden}
+.login-hero{padding:26px 28px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#f9fbfd,#eef4f8);text-align:center}
+.login-logo{width:96px;height:96px;object-fit:contain;margin:0 auto 10px;display:block}
+.login-hero h1{margin:0 0 8px;font-size:32px;letter-spacing:-.4px}
+.login-hero p{margin:0 auto;color:var(--muted);max-width:600px}
+.login-body{padding:24px;display:grid;gap:18px}
+.login-panel{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
+.login-box,.admin-box{border:1px solid var(--line);border-radius:20px;background:#fff;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.03)}
+.panel-title{font-size:13px;font-weight:800;color:#607186;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.endpoint-card{padding:14px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,#fafcfe,#f2f6fb)}
+.endpoint-label{font-size:12px;font-weight:700;color:#607186;text-transform:uppercase}
+.endpoint-url{font-family:Consolas,"Courier New",monospace;margin-top:6px;color:#1a4f88;word-break:break-all}
+.hint-line{font-size:12px;color:var(--muted);margin-top:6px}
+.login-grid,.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.login-row label,.admin-grid label{display:block;margin-bottom:6px;font-weight:600;color:#415163}
+input,textarea{width:100%;border:1px solid #d7dfe8;border-radius:14px;background:#fff;padding:12px 14px;color:#203143;outline:none}
+input:focus,textarea:focus{border-color:#93cdb8;box-shadow:0 0 0 3px rgba(20,154,106,.10)}
+.login-actions{display:flex;gap:10px;justify-content:flex-end;align-items:center;margin-top:12px}
+.primary-btn{height:44px;padding:0 18px;border:none;border-radius:14px;color:#fff;background:linear-gradient(180deg,var(--green),var(--green-2));font-weight:700}
+.secondary-btn{height:44px;padding:0 18px;border:1px solid #d5dce4;border-radius:14px;background:linear-gradient(180deg,#fff,#eef2f7);color:#46566a}
+#adminOutput{white-space:pre-wrap;display:none;margin-top:10px}
+
+#appScreen{display:none;flex:1;min-height:0;flex-direction:column}
+.main{flex:1;min-height:0;display:grid;grid-template-columns:300px 480px 1fr;gap:0}
+.sidebar,.list-pane,.viewer-pane{min-height:0}
+.sidebar{
+  background:linear-gradient(180deg,#f9fbfd,#f0f4f8);
+  border-right:1px solid var(--line);
+  padding:16px;
+  overflow:auto;
+}
+.nav-group{margin-bottom:16px}
+.section-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#7b8999;margin:8px 0 10px}
+.sidebtn{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:12px 14px;border:none;border-radius:16px;background:transparent;color:#394b5f;text-align:left;
+}
+.sidebtn:hover{background:#eef4f8}
+.sidebtn.active{background:var(--green-soft);color:#0d7d55;font-weight:700}
+.side-left{display:flex;align-items:center;gap:12px}
+.count{min-width:28px;height:28px;border-radius:14px;display:grid;place-items:center;background:#ecf1f6;color:#6f8193;font-size:13px}
+.sidebtn.active .count{background:#ccebdd;color:#0d7d55}
+.folder-list .sidebtn{padding-left:8px}
+.storage-card,.account-card{margin-top:14px;padding:16px;border:1px solid var(--line);border-radius:18px;background:#fff}
+.storage-bar{height:10px;border-radius:999px;background:#e7edf3;margin-top:10px;overflow:hidden}
+.storage-fill{height:100%;width:32%;background:linear-gradient(90deg,var(--green),#49c18f);border-radius:999px}
+.mini-footer{display:flex;align-items:center;justify-content:space-between;margin-top:18px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted)}
+.toggle{width:42px;height:24px;border-radius:999px;background:#d6dde5;position:relative}
+.toggle::after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+
+.list-pane{display:flex;flex-direction:column;background:#fff;border-right:1px solid var(--line)}
+.list-toolbar{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff}
+.message-tabs{display:flex;align-items:center;gap:28px}
+.message-tab{font-weight:700;color:#506174;position:relative;padding:6px 0;cursor:pointer}
+.message-tab.active{color:#168f64}
+.message-tab.active::after{content:"";position:absolute;left:0;right:0;bottom:-14px;height:4px;border-radius:4px;background:#168f64}
+.list-actions{display:flex;align-items:center;gap:12px;color:#5e6f82}
+#messageList{flex:1;overflow:auto;background:#fff}
+.card{display:block;padding:16px 18px;border-bottom:1px solid var(--line);cursor:pointer;background:#fff;position:relative}
+.card:hover{background:#f7fafc}
+.card.selected{background:#eff7f2}
+.card.unread{background:#f5fbf7}
+.card .dot{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:12px;height:12px;border-radius:50%;background:#159a6a}
+.card-content{padding-left:24px}
+.card-top{display:flex;gap:10px;justify-content:space-between;align-items:flex-start;margin-bottom:4px}
+.sender{font-weight:700;color:#1f2f42}
+.subj{font-weight:700;color:#1f2f42;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.preview{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.date{font-weight:600;color:#617386;font-size:13px;white-space:nowrap}
+.star{position:absolute;right:16px;bottom:16px;color:#95a3b4}
+.card.flagged .star{color:#d6a300}
+
+.viewer-pane{display:flex;flex-direction:column;background:linear-gradient(180deg,#fbfcfd,#f7f9fb)}
+.viewer-toolbar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);background:#fff}
+.viewer-actions{display:flex;align-items:center;gap:22px;flex-wrap:wrap;color:#516375}
+.tool-link{border:none;background:none;padding:0;color:inherit;font:inherit}
+.tool-link:disabled{opacity:.45}
+.viewer-controls{display:flex;align-items:center;gap:16px;color:#708093}
+.viewer{flex:1;overflow:auto;padding:24px 28px}
+.empty{height:100%;display:grid;place-items:center;text-align:center;color:var(--muted);border:1px dashed var(--line-2);border-radius:22px;background:rgba(255,255,255,.65)}
+.paper{max-width:none;width:100%;border:none;border-radius:0;background:transparent;box-shadow:none;overflow:visible}
+.msghead{padding:0 0 16px 0;background:none;border-bottom:1px solid var(--line)}
+.msgtitle-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.msgtitle{font-size:24px;font-weight:700;color:#1b2b3d;margin:0}
+.pill{padding:7px 12px;border-radius:999px;background:#dff0e7;color:#0f7b54;font-weight:700;font-size:13px}
+.msgmeta{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:18px}
+.person-line{display:flex;align-items:center;gap:14px}
+.person-avatar{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:#d9f0e4;color:#0f7b54;font-weight:800;font-size:22px}
+.person-info{display:flex;flex-direction:column;gap:4px}
+.person-name{font-weight:700;font-size:18px}
+.person-email{color:var(--muted)}
+.person-to{color:#3c4e61}
+.body{padding:28px 0 12px 0;white-space:pre-wrap;line-height:1.75;font-size:16px;color:#243548}
+.body a{color:#157d58}
+.attach-card{margin-top:22px;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px;border:1px solid var(--line);border-radius:16px;background:#fff;max-width:420px}
+.reply-box{margin-top:28px;display:flex;align-items:center;gap:14px;padding:16px;border:1px solid var(--line);border-radius:20px;background:#fff}
+.reply-avatar{width:48px;height:48px;object-fit:contain;border-radius:50%;background:#eef8f4;padding:5px}
+.reply-input{flex:1;padding:14px 16px;border:1px solid var(--line);border-radius:16px;color:#7a8999}
+.reply-send{width:48px;height:48px;border:none;border-radius:14px;background:linear-gradient(180deg,var(--green),var(--green-2));color:#fff;font-size:22px}
+.raw{white-space:pre-wrap;font-family:Consolas,"Courier New",monospace;font-size:12px;line-height:1.45;border:1px solid var(--line);border-radius:18px;background:#fff;padding:16px}
+
+.overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(23,35,48,.34);backdrop-filter:blur(4px);padding:20px;z-index:80}
+.overlay.open{display:flex}
+.dialog{width:min(920px,100%);height:min(780px,100%);display:flex;flex-direction:column;border:1px solid var(--line);border-radius:24px;overflow:hidden;background:#fff;box-shadow:0 18px 52px rgba(20,30,45,.24)}
+.dialog-title{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#fbfcfe,#f1f5fa);font-size:18px;font-weight:700}
+.dialog-body{flex:1;overflow:auto;padding:20px;display:grid;gap:12px}
+.compose-row{display:grid;grid-template-columns:88px 1fr;gap:10px;align-items:center}
+.compose-row label{font-weight:700;color:#47586c}
+.compose-text,.signature-box{min-height:260px;border-radius:18px}
+.attach-list{display:grid;gap:10px}
+.attach-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.attach-left{display:flex;align-items:center;gap:10px;min-width:0}
+.attach-thumb{width:40px;height:32px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.attach-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:400px}
+.actions{padding:16px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:10px;background:#f8fbfd}
+
+.status{height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-top:1px solid var(--line);background:#f6f9fc;color:#4d5f73}
+.error{color:var(--danger);font-weight:700}
+.success{color:#158f63;font-weight:700}
+.notice{padding:14px;border:1px solid var(--line);border-radius:16px;background:#fbfcfe;color:#57687b}
+
+@media(max-width:1300px){
+  .main{grid-template-columns:260px 380px 1fr}
+}
+@media(max-width:1080px){
+  .app-header{flex-wrap:wrap;height:auto}
+  .brand-wrap{min-width:unset}
+  .main{grid-template-columns:250px 1fr}
+  .viewer-pane{display:none}
+  .main.show-viewer{grid-template-columns:1fr}
+  .main.show-viewer .sidebar,.main.show-viewer .list-pane{display:none}
+  .main.show-viewer .viewer-pane{display:flex}
+  .login-panel{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  .login-grid,.admin-grid{grid-template-columns:1fr}
+  .brand-title{font-size:20px}
+  .header-actions{width:100%;order:3}
+  .compose-main{min-width:150px}
+  .main{grid-template-columns:1fr}
+  .sidebar{display:none}
+}
+
+/* Preserved login screen */
 #loginScreen{flex:1;display:grid;place-items:center;padding:20px;overflow:auto}
 .login-card{
   width:min(860px,100%);
   border:1px solid #7d8fa9;
   border-radius:10px;
-  background:var(--glass);
+  background:rgba(245,249,255,.88);
   box-shadow:0 12px 30px rgba(30,45,70,.28),inset 0 1px rgba(255,255,255,.95);
   overflow:hidden;
 }
-.login-head{padding:14px;border-bottom:1px solid var(--line2);background:linear-gradient(#fff,#d9e4f2)}
+.login-head{padding:14px;border-bottom:1px solid #b8c4d3;background:linear-gradient(#fff,#d9e4f2);text-align:center}
 .login-head h1{font-size:22px;margin:0 0 4px;letter-spacing:-.2px}
-.login-head p{margin:0;color:var(--muted)}
+.login-head p{margin:0 auto;color:#63728a;max-width:560px}
+.hero-logo{max-width:280px;width:100%;height:auto;display:block;margin:0 auto 14px auto;filter:drop-shadow(0 4px 10px rgba(0,0,0,.12))}
 .login-body{padding:14px;display:grid;gap:10px}
 .login-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.login-row input{width:100%}
+.login-actions{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:4px}
+.admin-box{margin-top:14px;border-top:1px solid #b8c4d3;padding-top:14px}
+.admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .endpoint-card{
   border:1px solid #9fb0c6;
   border-radius:8px;
@@ -142,132 +253,80 @@ label{display:block;margin-bottom:3px;font-weight:600;color:#283951}
   overflow:hidden;
   text-overflow:ellipsis;
 }
-.hint-line{
-  color:#65748a;
-  font-size:12px;
-  line-height:1.35;
-  margin-top:4px;
+.hint-line{color:#65748a;font-size:12px;line-height:1.35;margin-top:4px}
+
+
+/* Login screen remains standalone: no top bar before login */
+body.login-mode .app-header{display:none}
+body.login-mode #appScreen{display:none !important}
+body.login-mode #loginScreen{display:grid !important}
+body.login-mode .status{display:none}
+body.login-mode .window{
+  background:
+    radial-gradient(circle at 18% 8%, rgba(255,255,255,.95), transparent 30%),
+    radial-gradient(circle at 82% 20%, rgba(196,224,242,.72), transparent 34%),
+    linear-gradient(135deg,#f5f9fd,#ccd8e7);
 }
-.login-row input{width:100%}
-.login-actions{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:4px}
-.admin-box{margin-top:14px;border-top:1px solid var(--line2);padding-top:14px}
-.admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+body.app-mode #loginScreen{display:none !important}
+body.app-mode #appScreen{display:flex !important}
 
-#appScreen{flex:1;min-height:0;display:none;flex-direction:column}
-.topbar{
-  display:grid;
-  grid-template-columns:1fr auto auto auto;
-  gap:8px;
-  padding:10px;
-  border-bottom:1px solid var(--line2);
-  background:rgba(232,239,249,.86);
-  align-items:center;
+
+/* STRICT LOGIN MODE FIX:
+   The login screen is standalone. Mail chrome/topbar only appears after login. */
+body.login-mode .app-header,
+body.login-mode #appScreen,
+body.login-mode .status,
+body.login-mode .main,
+body.login-mode .topbar,
+body.login-mode .sidebar,
+body.login-mode .list-pane,
+body.login-mode .viewer-pane {
+  display: none !important;
 }
-.account-line{min-width:0}
-.account-name{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.account-meta{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-.main{flex:1;min-height:0;display:grid;grid-template-columns:190px minmax(300px,390px) minmax(360px,1fr)}
-.sidebar{overflow:auto;padding:10px;border-right:1px solid var(--line2);background:rgba(232,238,248,.62)}
-.section{margin-bottom:14px}
-.section-title{font-size:12px;font-weight:800;color:#33445f;text-transform:uppercase;letter-spacing:.4px;margin-bottom:7px}
-.sidebtn{width:100%;text-align:left;margin-bottom:6px;display:flex;justify-content:space-between;gap:8px}
-.count{color:var(--muted)}
-.sidebtn.active .count,.sidebtn:active .count{color:#fff}
-
-.list-pane{display:flex;flex-direction:column;min-width:0;border-right:1px solid var(--line2);background:rgba(245,248,252,.9)}
-.listbar{padding:8px;display:grid;grid-template-columns:1fr auto;gap:8px;border-bottom:1px solid var(--line2)}
-.listbar input{width:100%}
-.message-list{flex:1;min-height:0;overflow:auto;background:#fff}
-.card{padding:10px;border-bottom:1px solid #d5dbe5;cursor:pointer;background:linear-gradient(#fff,#f7f9fd)}
-.card:hover,.card.selected{color:#fff;background:linear-gradient(var(--blue1),var(--blue2))}
-.card.unread .subj{font-weight:800}
-.subj{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
-.meta,.date,.preview{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card:hover .meta,.card:hover .date,.card:hover .preview,.card.selected .meta,.card.selected .date,.card.selected .preview{color:rgba(255,255,255,.92)}
-
-.viewer-pane{display:flex;flex-direction:column;min-width:0;min-height:0}
-.viewerbar{padding:8px;display:flex;flex-wrap:wrap;gap:7px;border-bottom:1px solid var(--line2);background:rgba(235,241,250,.88)}
-.viewer{flex:1;min-height:0;overflow:auto;padding:14px;background:linear-gradient(rgba(255,255,255,.65),rgba(255,255,255,.35)),#f7f9fc}
-.notice,.empty{
-  padding:14px;
-  border:1px solid #a7b4c7;
-  border-radius:8px;
-  background:#fff;
-  box-shadow:0 1px 4px rgba(0,0,0,.12);
-  color:var(--muted);
+body.login-mode #loginScreen {
+  display: grid !important;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
 }
-.empty{height:100%;display:grid;place-items:center;text-align:center}
-.paper{max-width:920px;margin:0 auto;border:1px solid #a9b6c8;border-radius:8px;background:#fff;box-shadow:0 3px 12px rgba(0,0,0,.16);overflow:hidden}
-.msghead{padding:14px;background:linear-gradient(#f9fbff,#e6edf7);border-bottom:1px solid #b8c4d6}
-.msgtitle{font-size:18px;font-weight:700;color:#17283f;margin-bottom:10px}
-.row{margin-bottom:4px;color:#2f3f55}
-.row b{font-weight:800}
-.body{padding:16px;white-space:pre-wrap;line-height:1.48}
-.body a{color:#0b58aa;text-decoration:underline}
-.raw{max-width:980px;margin:0 auto;white-space:pre-wrap;font-family:Consolas,"Courier New",monospace;font-size:12px;line-height:1.35;border:1px solid #a9b6c8;border-radius:8px;background:#fff;padding:12px;box-shadow:0 3px 12px rgba(0,0,0,.16)}
 
-.overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(18,31,50,.38);backdrop-filter:blur(5px);z-index:50}
-.overlay.open{display:flex}
-.dialog{width:min(850px,100%);height:min(720px,100%);display:flex;flex-direction:column;border:1px solid rgba(54,70,94,.85);border-radius:10px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(226,234,246,.94));box-shadow:0 18px 50px rgba(0,0,0,.38),inset 0 1px rgba(255,255,255,.98)}
-.dialog-title{min-height:40px;display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:linear-gradient(#fff,#d2deef 48%,#97a9c5);border-bottom:1px solid #8394ad;font-weight:700}
-.dialog-body{flex:1;min-height:0;overflow:auto;padding:12px;display:grid;gap:8px}
-.compose-row{display:grid;grid-template-columns:76px 1fr;gap:8px;align-items:center}
-.compose-row label{margin:0;text-align:right}
-.compose-row input{width:100%}
-.compose-text{min-height:250px;width:100%}
-.actions{padding:10px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--line2);background:rgba(232,238,248,.86)}
-.attach-list{display:grid;gap:6px}
-.attach-item{padding:7px;border:1px solid #aeb9c8;border-radius:6px;background:#fff;display:flex;align-items:center;gap:8px;justify-content:space-between}
-.attach-left{display:flex;align-items:center;gap:8px;min-width:0}
-.attach-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px}
-.attach-thumb{width:36px;height:28px;object-fit:cover;border:1px solid #b8c4d6;border-radius:4px;background:#f3f6fb}
-.signature-box{min-height:180px;width:100%}
-
-.status{min-height:28px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:5px 10px;color:#26364d;background:linear-gradient(#eaf0f8,#c8d4e5);border-top:1px solid #8798b1}
-.status-left{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.status-right{color:var(--muted);white-space:nowrap}
-.error{color:var(--danger);font-weight:700}
-.success{color:var(--success);font-weight:700}
-
-@media(max-width:980px){
-  .login-grid,.admin-grid{grid-template-columns:1fr}
-  .topbar{grid-template-columns:1fr}
-  .main{grid-template-columns:150px 1fr}
-  .viewer-pane{display:none}
-  .main.show-viewer{grid-template-columns:1fr}
-  .main.show-viewer .sidebar,.main.show-viewer .list-pane{display:none}
-  .main.show-viewer .viewer-pane{display:flex}
+body.login-mode .window {
+  background:
+    radial-gradient(circle at 18% 8%, rgba(255,255,255,.95), transparent 30%),
+    radial-gradient(circle at 82% 20%, rgba(196,224,242,.72), transparent 34%),
+    linear-gradient(135deg,#f5f9fd,#ccd8e7) !important;
 }
+
+body.app-mode #loginScreen {
+  display: none !important;
+}
+
+body.app-mode #appScreen {
+  display: flex !important;
+}
+
+/* Keep app header inside the app screen only */
+#appScreen > .app-header {
+  flex: 0 0 auto;
+}
+
 </style>
 </head>
-
-<body>
+<body class="login-mode">
 <div class="shell">
   <div class="window">
-    <header class="titlebar">
-      <div class="brand">
-        <div class="logo">V6</div>
-        <div style="min-width:0">
-          <div class="brand-title">Emerald Mail V6</div>
-          <div id="titleSubtitle" class="brand-subtitle">Secure Emerald Mail workspace</div>
-        </div>
-      </div>
-      <button id="logoutTopBtn" onclick="logout()" style="display:none">Logout</button>
-    </header>
-
-    <section id="loginScreen">
+<section id="loginScreen">
       <div class="login-card">
         <div class="login-head">
-          <img id="heroLogo" class="hero-logo" alt="Emerald Mail" src="./emerald-mail-logo.png">
-          <h1>Welcome to Emerald Mail</h1>
-          <p>Sign in with your mailbox password. The frontend is already connected to your backend worker.</p>
+          <h1>Sign in to Emerald Mail</h1>
+          <p>Sign in with your Emerald Mail account. The Worker endpoint is built in, so no URL entry is required.</p>
         </div>
         <div class="login-body">
           <div class="endpoint-card">
             <div class="endpoint-label">Backend Endpoint</div>
             <div class="endpoint-url">https://emerald-mail-router.wyatt-monroe2013.workers.dev</div>
-            <div class="hint-line">This frontend is already connected to your Emerald Mail Worker.</div>
+            <div class="hint-line">This frontend is preconfigured for your Emerald Mail Worker. To change it later, edit <b>EMERALD_MAIL_WORKER_URL</b> in the script.</div>
           </div>
 
           <div class="login-grid">
@@ -292,7 +351,7 @@ label{display:block;margin-bottom:3px;font-weight:600;color:#283951}
           </div>
 
           <div class="admin-box">
-            <div class="section-title">Setup and account creation</div>
+            <div class="section-title">First-time setup / account creation</div>
             <div class="admin-grid">
               <div>
                 <label for="adminKey">Admin Key</label>
@@ -320,9 +379,9 @@ label{display:block;margin-bottom:3px;font-weight:600;color:#283951}
               </div>
             </div>
             <div class="login-actions">
-              <button onclick="runSetup()">Run V6 Setup</button>
-              <button onclick="createAccount()">Create Firestore Account</button>
-              <button onclick="listAdminAccounts()">List Firestore Accounts</button>
+              <button onclick="runSetup()">Run Setup</button>
+              <button onclick="createAccount()">Create Account</button>
+              <button onclick="listAdminAccounts()">List Accounts</button>
             </div>
             <div id="adminOutput" class="notice" style="display:none;white-space:pre-wrap"></div>
           </div>
@@ -331,54 +390,100 @@ label{display:block;margin-bottom:3px;font-weight:600;color:#283951}
     </section>
 
     <section id="appScreen">
-      <div class="topbar">
-        <div class="account-line">
-          <div id="accountName" class="account-name">Not signed in</div>
-          <div id="accountMeta" class="account-meta"></div>
-        </div>
-        <button onclick="openCompose()">Compose</button>
-        <button onclick="loadFolder()">Refresh</button>
-        <button onclick="openSignature()">Signature</button>
-      </div>
 
+    <header class="app-header">
+      <div class="brand-wrap">
+        <img id="headerLogo" class="brand-logo" src="./emerald-mail-logo.png" alt="Emerald Mail">
+        <div class="brand-text">
+          <div class="brand-title">Emerald <span>Mail</span></div>
+          <div id="titleSubtitle" class="brand-subtitle">Secure Emerald Mail workspace</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="compose-main" onclick="openCompose()">✎&nbsp;&nbsp;Compose</button>
+        <button class="header-btn" onclick="loadFolder()">⟳&nbsp;&nbsp;Refresh</button>
+        <div class="search-wrap">
+          <input id="searchBox" placeholder="Search mail" oninput="renderMessageList()">
+          <button class="search-btn">⌕</button>
+        </div>
+      </div>
+      <div class="header-right">
+        <button id="logoutTopBtn" class="header-btn" onclick="logout()" style="display:none">Logout</button>
+        <div class="icon-circle">?</div>
+        <div class="profile-chip">
+          <img id="profileAvatar" class="profile-avatar" src="./emerald-mail-logo.png" alt="Profile">
+          <div class="profile-meta">
+            <div id="profileName" class="profile-name">Emerald User</div>
+            <div id="profileSub" class="profile-sub">Mailbox</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    
       <main id="main" class="main">
         <aside class="sidebar">
-          <div class="section">
+          <div class="nav-group">
+            <button id="folder-inbox" class="sidebtn active" onclick="setFolder('inbox')"><span class="side-left"><span>📥</span><span>Inbox</span></span><span id="count-inbox" class="count">0</span></button>
+            <button id="folder-sent" class="sidebtn" onclick="setFolder('sent')"><span class="side-left"><span>✈</span><span>Sent</span></span><span id="count-sent" class="count">0</span></button>
+            <button id="folder-drafts" class="sidebtn" onclick="setFolder('drafts')"><span class="side-left"><span>📝</span><span>Drafts</span></span><span id="count-drafts" class="count">0</span></button>
+            <button id="folder-trash" class="sidebtn" onclick="setFolder('trash')"><span class="side-left"><span>🗑</span><span>Trash</span></span><span id="count-trash" class="count">0</span></button>
+            <button class="sidebtn"><span class="side-left"><span>🗂</span><span>Archive</span></span><span class="count">0</span></button>
+            <button class="sidebtn"><span class="side-left"><span>⛔</span><span>Spam</span></span><span class="count">0</span></button>
+            <button class="sidebtn"><span class="side-left"><span>☆</span><span>Starred</span></span><span class="count">0</span></button>
+          </div>
+
+          <div class="nav-group folder-list">
             <div class="section-title">Folders</div>
-            <button id="folder-inbox" class="sidebtn active" onclick="setFolder('inbox')"><span>Inbox</span><span id="count-inbox" class="count">0</span></button>
-            <button id="folder-sent" class="sidebtn" onclick="setFolder('sent')"><span>Sent</span><span id="count-sent" class="count">0</span></button>
-            <button id="folder-drafts" class="sidebtn" onclick="setFolder('drafts')"><span>Drafts</span><span id="count-drafts" class="count">0</span></button>
-            <button id="folder-trash" class="sidebtn" onclick="setFolder('trash')"><span>Trash</span><span id="count-trash" class="count">0</span></button>
+            <button class="sidebtn"><span class="side-left"><span>📁</span><span>Work</span></span></button>
+            <button class="sidebtn"><span class="side-left"><span>📁</span><span>Personal</span></span></button>
+            <button class="sidebtn"><span class="side-left"><span>📁</span><span>Projects</span></span></button>
+            <button class="sidebtn"><span class="side-left"><span>📁</span><span>Receipts</span></span></button>
           </div>
 
-          <div class="section">
-            <div class="section-title">Actions</div>
-            <button class="sidebtn" onclick="openCompose()">New Message</button>
-            <button class="sidebtn" onclick="loadFolder()">Refresh</button>
-            <button class="sidebtn" onclick="logout()">Logout</button>
+          <div class="storage-card">
+            <div style="font-weight:700;margin-bottom:2px">Storage</div>
+            <div style="color:var(--muted)">2.4 GB of 15 GB used</div>
+            <div class="storage-bar"><div class="storage-fill"></div></div>
           </div>
 
-          <div class="section">
-            <div class="section-title">Account</div>
-            <div id="accountBox" class="notice"></div>
+          <div class="account-card">
+            <div class="section-title" style="margin-top:0">Account</div>
+            <div id="accountName" style="font-weight:700;font-size:16px;margin-bottom:4px">Not signed in</div>
+            <div id="accountMeta" style="color:var(--muted);margin-bottom:10px">Mailbox</div>
+            <div id="accountBox" class="notice" style="padding:0;border:none;background:transparent"></div>
+          </div>
+
+          <div class="mini-footer">
+            <span>⚙</span>
+            <span>☀ <span class="toggle"></span></span>
           </div>
         </aside>
 
         <section class="list-pane">
-          <div class="listbar">
-            <input id="searchBox" placeholder="Search mail" oninput="renderMessageList()">
-            <button onclick="loadFolder()">Reload</button>
+          <div class="list-toolbar">
+            <div class="message-tabs">
+              <div class="message-tab active">All</div>
+              <div class="message-tab">Unread</div>
+              <div class="message-tab">Starred</div>
+            </div>
+            <div class="list-actions"><span>Sort</span><span>☰</span></div>
           </div>
-          <div id="messageList" class="message-list"></div>
+          <div id="messageList"></div>
         </section>
 
         <section class="viewer-pane">
-          <div class="viewerbar">
-            <button onclick="backToList()">Back</button>
-            <button onclick="openCompose()">Compose</button>
-            <button id="replyButton" onclick="replyToSelected()" disabled>Reply</button>
-            <button id="deleteButton" onclick="deleteSelectedMessage()" disabled>Move to Trash</button>
-            <button id="rawButton" onclick="toggleRawView()" disabled>Show Raw</button>
+          <div class="viewer-toolbar">
+            <div class="viewer-actions">
+              <button class="tool-link" onclick="backToList()">←</button>
+              <button class="tool-link" id="replyButton" onclick="replyToSelected()" disabled>Reply</button>
+              <button class="tool-link" id="deleteButton" onclick="deleteSelectedMessage()" disabled>Delete</button>
+              <button class="tool-link">Spam</button>
+              <button class="tool-link">Move</button>
+              <button class="tool-link" id="rawButton" onclick="toggleRawView()" disabled>Raw</button>
+              <button class="tool-link" onclick="openCompose()">Compose</button>
+            </div>
+            <div class="viewer-controls"><span>⌃</span><span>⌄</span></div>
           </div>
           <div id="viewer" class="viewer">
             <div class="empty">Select a message to read it.</div>
@@ -389,7 +494,7 @@ label{display:block;margin-bottom:3px;font-weight:600;color:#283951}
 
     <footer class="status">
       <div id="status" class="status-left">Ready.</div>
-      <div id="countStatus" class="status-right">V6 Firestore</div>
+      <div id="countStatus" class="status-right">Emerald Mail</div>
     </footer>
   </div>
 </div>
@@ -398,7 +503,7 @@ label{display:block;margin-bottom:3px;font-weight:600;color:#283951}
   <div class="dialog">
     <div class="dialog-title">
       <div id="composeTitle">New Message</div>
-      <button onclick="closeCompose()">Close</button>
+      <button class="secondary-btn" onclick="closeCompose()">Close</button>
     </div>
     <div class="dialog-body">
       <div class="compose-row"><label>From</label><input id="composeFrom" readonly></div>
@@ -415,14 +520,14 @@ label{display:block;margin-bottom:3px;font-weight:600;color:#283951}
       </div>
       <textarea id="composeText" class="compose-text" placeholder="Write your message..."></textarea>
       <div>
-        <label>Attachments</label>
+        <label style="display:block;margin-bottom:8px;font-weight:700;color:#47586c">Attachments</label>
         <input id="attachmentInput" type="file" multiple onchange="handleAttachmentPick(event)">
-        <div id="attachmentList" class="attach-list" style="margin-top:8px"></div>
+        <div id="attachmentList" class="attach-list" style="margin-top:10px"></div>
       </div>
     </div>
     <div class="actions">
-      <button onclick="saveDraft()">Save Draft</button>
-      <button onclick="sendComposedMessage()">Send</button>
+      <button class="secondary-btn" onclick="saveDraft()">Save Draft</button>
+      <button class="primary-btn" onclick="sendComposedMessage()">Send</button>
     </div>
   </div>
 </div>
@@ -431,18 +536,17 @@ label{display:block;margin-bottom:3px;font-weight:600;color:#283951}
   <div class="dialog" style="height:min(430px,100%)">
     <div class="dialog-title">
       <div>Account Signature</div>
-      <button onclick="closeSignature()">Close</button>
+      <button class="secondary-btn" onclick="closeSignature()">Close</button>
     </div>
     <div class="dialog-body">
       <textarea id="signatureText" class="signature-box" placeholder="--
 Monroe Corporation"></textarea>
     </div>
     <div class="actions">
-      <button onclick="saveSignature()">Save Signature</button>
+      <button class="primary-btn" onclick="saveSignature()">Save Signature</button>
     </div>
   </div>
 </div>
-
 <script>
 "use strict";
 
@@ -462,8 +566,10 @@ document.addEventListener("DOMContentLoaded", () => {
   document.title = "Emerald Mail";
   const heroLogo = document.getElementById("heroLogo");
   const headerLogo = document.getElementById("headerLogo");
+  const profileAvatar = document.getElementById("profileAvatar");
   if (heroLogo) heroLogo.src = EMERALD_MAIL_LOGO_PATH;
   if (headerLogo) headerLogo.src = EMERALD_MAIL_LOGO_PATH;
+  if (profileAvatar) profileAvatar.src = EMERALD_MAIL_LOGO_PATH;
   loadLocalSettings();
 
   document.getElementById("loginPassword").addEventListener("keydown", event => {
@@ -509,10 +615,12 @@ function saveLocalSettings() {
 function loadLocalSettings() {
   document.getElementById("rememberLogin").checked = localStorage.getItem("emerald_mail_v6_remember") === "true";
 
-  const token = activeToken();
-  if (token) {
-    checkSession();
-  }
+  /*
+    Emerald Mail intentionally starts on the Silver-like login screen.
+    A stored session is kept only for API use after the user chooses to sign in again.
+  */
+  document.body.classList.remove("app-mode");
+  document.body.classList.add("login-mode");
 }
 
 async function api(path, options = {}) {
@@ -567,12 +675,12 @@ async function healthCheck() {
 async function runSetup() {
   try {
     saveLocalSettings();
-    setStatus("Running V6 Firestore setup...");
+    setStatus("Running Emerald Mail setup...");
     const res = await adminApi("/api/setup");
     const data = await res.json();
     showAdminOutput(data);
     if (!data.ok) throw new Error(data.error || "Setup failed.");
-    setStatus("V6 Firestore setup complete.", false, true);
+    setStatus("Emerald Mail setup complete.", false, true);
   } catch (error) {
     setStatus(error.message, true);
   }
@@ -674,6 +782,8 @@ async function checkSession() {
 }
 
 async function logout() {
+  document.body.classList.remove("app-mode");
+  document.body.classList.add("login-mode");
   try {
     await api("/api/auth/logout", {method:"POST", body:"{}"});
   } catch {}
@@ -683,17 +793,21 @@ async function logout() {
   currentAccount = null;
   selectedMessage = null;
   currentMessages = [];
+  document.body.classList.remove("app-mode");
+  document.body.classList.add("login-mode");
   document.getElementById("appScreen").style.display = "none";
   document.getElementById("loginScreen").style.display = "grid";
-  document.getElementById("logoutTopBtn").style.display = "none";
+  if (document.getElementById("logoutTopBtn")) if (document.getElementById("logoutTopBtn")) document.getElementById("logoutTopBtn").style.display = "none";
   document.getElementById("titleSubtitle").textContent = "Secure Emerald Mail workspace";
   setStatus("Signed out.");
 }
 
 function showApp() {
+  document.body.classList.remove("login-mode");
+  document.body.classList.add("app-mode");
   document.getElementById("loginScreen").style.display = "none";
   document.getElementById("appScreen").style.display = "flex";
-  document.getElementById("logoutTopBtn").style.display = "inline-block";
+  if (document.getElementById("logoutTopBtn")) if (document.getElementById("logoutTopBtn")) document.getElementById("logoutTopBtn").style.display = "inline-block";
 
   const label = currentAccount.display_name + " <" + currentAccount.address + ">";
   document.getElementById("accountName").textContent = label;
@@ -764,7 +878,7 @@ function renderMessageList(keepSelection = true) {
   if (!messages.length) {
     const empty = document.createElement("div");
     empty.className = "notice";
-    empty.style.margin = "10px";
+    empty.style.margin = "14px";
     empty.textContent = currentMessages.length ? "No messages match your search." : "No messages in this folder.";
     list.appendChild(empty);
     setCountStatus("0 messages");
@@ -775,28 +889,42 @@ function renderMessageList(keepSelection = true) {
   for (const m of messages) {
     const card = document.createElement("div");
     card.className = "card" + (Number(m.read) ? "" : " unread");
+    if (m.starred) card.classList.add("flagged");
     card.dataset.id = m.id;
+
+    const dot = document.createElement("div");
+    dot.className = "dot";
+
+    const content = document.createElement("div");
+    content.className = "card-content";
+
+    const top = document.createElement("div");
+    top.className = "card-top";
+
+    const sender = document.createElement("div");
+    sender.className = "sender";
+    sender.textContent = currentFolder === "sent" ? (m.recipient || "") : (m.sender || "Unknown");
+
+    const date = document.createElement("div");
+    date.className = "date";
+    date.textContent = formatSmartDate(m.received_at);
+
+    top.append(sender, date);
 
     const subj = document.createElement("div");
     subj.className = "subj";
     subj.textContent = m.subject || "(No subject)";
 
-    const meta = document.createElement("div");
-    meta.className = "meta";
-    meta.textContent = currentFolder === "sent" ? "To: " + (m.recipient || "") : "From: " + (m.sender || "");
-
     const prev = document.createElement("div");
     prev.className = "preview";
     prev.textContent = m.text_preview || "";
 
-    const date = document.createElement("div");
-    date.className = "date";
-    date.textContent = formatDate(m.received_at);
+    const star = document.createElement("div");
+    star.className = "star";
+    star.textContent = m.starred ? "★" : "☆";
 
-    card.append(subj, meta);
-    if (prev.textContent) card.append(prev);
-    card.append(date);
-
+    content.append(top, subj, prev);
+    card.append(dot, content, star);
     card.onclick = () => openMessage(m.id);
     list.appendChild(card);
   }
@@ -870,19 +998,71 @@ function renderParsedMessage(parsed) {
   const head = document.createElement("div");
   head.className = "msghead";
 
+  const titleLine = document.createElement("div");
+  titleLine.className = "msgtitle-line";
+
   const title = document.createElement("div");
   title.className = "msgtitle";
   title.textContent = parsed.subject || "(No subject)";
 
-  head.append(title, headerRow("From", parsed.from), headerRow("To", parsed.to), headerRow("Date", parsed.date));
+  const pill = document.createElement("div");
+  pill.className = "pill";
+  pill.textContent = currentFolder.charAt(0).toUpperCase() + currentFolder.slice(1);
+
+  titleLine.append(title, pill);
+
+  const meta = document.createElement("div");
+  meta.className = "msgmeta";
+
+  const personLine = document.createElement("div");
+  personLine.className = "person-line";
+
+  const avatar = document.createElement("div");
+  avatar.className = "person-avatar";
+  const senderText = (parsed.from || selectedMessage?.sender || "?").trim();
+  avatar.textContent = initialsFromText(senderText);
+
+  const personInfo = document.createElement("div");
+  personInfo.className = "person-info";
+
+  const name = document.createElement("div");
+  name.className = "person-name";
+  name.textContent = senderText || "Unknown Sender";
+
+  const toLine = document.createElement("div");
+  toLine.className = "person-to";
+  toLine.textContent = "To " + (currentAccount?.display_name || currentAccount?.address || "you");
+
+  personInfo.append(name, toLine);
+  personLine.append(avatar, personInfo);
+
+  const rightMeta = document.createElement("div");
+  rightMeta.className = "person-email";
+  rightMeta.textContent = parsed.date || "";
+
+  meta.append(personLine, rightMeta);
 
   const body = document.createElement("div");
   body.className = "body";
   body.innerHTML = linkifyAndEscape(parsed.body || "No readable body found.");
 
+  head.append(titleLine, meta);
   paper.append(head, body);
+
+  if ((selectedMessage?.attachments_json && selectedMessage.attachments_json !== "[]") || /\.pdf/i.test(selectedMessage?.subject || "")) {
+    const attach = document.createElement("div");
+    attach.className = "attach-card";
+    attach.innerHTML = `<div><div style="font-weight:700">Attachment</div><div style="color:var(--muted);font-size:13px">Open from the raw message or message metadata</div></div><div style="color:var(--muted)">⇩</div>`;
+    paper.appendChild(attach);
+  }
+
+  const reply = document.createElement("div");
+  reply.className = "reply-box";
+  reply.innerHTML = `<img class="reply-avatar" src="${EMERALD_MAIL_LOGO_PATH}" alt="Emerald Mail"><div class="reply-input">Click here to <b>Reply</b> or <b>Forward</b></div><button class="reply-send" onclick="replyToSelected()">➤</button>`;
+  paper.appendChild(reply);
+
   viewer.appendChild(paper);
-  document.getElementById("rawButton").textContent = "Show Raw";
+  document.getElementById("rawButton").textContent = "Raw";
 }
 
 function renderRaw() {
@@ -1355,6 +1535,25 @@ function linkifyAndEscape(text) {
 
 function textToHtml(text) {
   return "<div>" + linkifyAndEscape(text).replace(/\n/g,"<br>") + "</div>";
+}
+
+function initialsFromText(value) {
+  const cleaned = String(value || "").replace(/<[^>]+>/g, "").trim();
+  const parts = cleaned.split(/\s+/).filter(Boolean);
+  if (!parts.length) return "?";
+  return parts.slice(0,2).map(p => p[0].toUpperCase()).join("");
+}
+
+function formatSmartDate(value) {
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return String(value || "");
+  const now = new Date();
+  const sameDay = d.toDateString() === now.toDateString();
+  if (sameDay) return d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+  const yesterday = new Date();
+  yesterday.setDate(now.getDate()-1);
+  if (d.toDateString() === yesterday.toDateString()) return 'Yesterday';
+  return d.toLocaleDateString([], {month:'short', day:'numeric'});
 }
 
 function formatDate(value) {
