@@ -1055,13 +1055,35 @@ input:focus,textarea:focus{
   .brand-title{font-size:22px}
 }
 </style>
+
+<style id="emerald-mail-alpha2-enhancements">
+.nav-item { cursor: pointer; }
+.nav-item.disabled { opacity:.55; }
+.tab { cursor:pointer; user-select:none; }
+.reader-actions button { cursor:pointer; border-radius:9px; padding:7px 8px; }
+.reader-actions button:hover:not(:disabled) { background:#edf6f1; color:var(--green-dark); }
+.reader-actions button:disabled { cursor:not-allowed; opacity:.42; }
+.account-chip { cursor:pointer; }
+.help { cursor:pointer; }
+.search button { cursor:pointer; }
+.star { cursor:pointer; }
+.toast-stack{position:fixed;right:18px;bottom:18px;z-index:99999;display:grid;gap:8px}
+.toast{border:1px solid var(--line);border-radius:12px;background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.16);padding:12px 14px;color:var(--text);min-width:240px}
+.toast.good{border-color:#b7e4d1;background:#f3fcf8}
+.toast.bad{border-color:#e0b7b7;background:#fff5f5;color:#8e2222}
+.help-panel{line-height:1.55;color:#405166}
+.help-panel h3{margin:0 0 8px;color:var(--green-dark)}
+.help-panel ul{margin:8px 0 0 18px;padding:0}
+.folder-pill.clickable{cursor:pointer}
+</style>
+
 </head>
 
 <body>
 <section id="loginScreen">
   <div class="login-card">
     <div class="login-head">
-      <img src="emerald-mail-logo.png" alt="Emerald Mail">
+      <img src="./emerald-mail-logo.png" alt="Emerald Mail">
       <h1>Emerald Mail</h1>
       <p>Sign in with your mailbox password.</p>
     </div>
@@ -1159,7 +1181,7 @@ input:focus,textarea:focus{
       </div>
 
       <div class="profile">
-        <button class="help">?</button>
+        <button class="help" onclick="openHelpDialog()">?</button>
         <div class="account-chip">
           <img src="./emerald-mail-logo.png" alt="Profile">
           <div>
@@ -1188,20 +1210,22 @@ input:focus,textarea:focus{
           <span class="nav-left"><span class="nav-icon">♲</span><span>Trash</span></span>
           <span id="count-trash" class="badge">0</span>
         </button>
-        <button class="nav-item">
+        <button id="folder-archive" class="nav-item" onclick="setFolder('archive')">
           <span class="nav-left"><span class="nav-icon">▥</span><span>Archive</span></span>
+          <span id="count-archive" class="badge">0</span>
         </button>
-        <button class="nav-item">
+        <button id="folder-spam" class="nav-item" onclick="setFolder('spam')">
           <span class="nav-left"><span class="nav-icon">◇</span><span>Spam</span></span>
-          <span class="badge">0</span>
+          <span id="count-spam" class="badge">0</span>
         </button>
-        <button class="nav-item">
+        <button id="folder-starred" class="nav-item" onclick="setFolder('starred')">
           <span class="nav-left"><span class="nav-icon">☆</span><span>Starred</span></span>
+          <span id="count-starred" class="badge">0</span>
         </button>
-        <button class="nav-item">
+        <button id="folder-snoozed" class="nav-item" onclick="setFolder('snoozed')">
           <span class="nav-left"><span class="nav-icon">◷</span><span>Snoozed</span></span>
         </button>
-        <button class="nav-item">
+        <button id="folder-important" class="nav-item" onclick="setFolder('important')">
           <span class="nav-left"><span class="nav-icon">⚑</span><span>Important</span></span>
         </button>
 
@@ -1243,11 +1267,11 @@ input:focus,textarea:focus{
         <div class="reader-toolbar">
           <div class="reader-actions">
             <button onclick="backToList()">←</button>
-            <button>▣&nbsp; Archive</button>
+            <button onclick="archiveSelectedMessage()">▣&nbsp; Archive</button>
             <button id="deleteButton" onclick="deleteSelectedMessage()" disabled>♲&nbsp; Delete</button>
-            <button>◇&nbsp; Spam</button>
-            <button>□&nbsp; Move⌄</button>
-            <button>•••&nbsp; More</button>
+            <button onclick="spamSelectedMessage()">◇&nbsp; Spam</button>
+            <button onclick="moveSelectedMessage()">□&nbsp; Move⌄</button>
+            <button onclick="moreActions()">•••&nbsp; More</button>
             <button id="rawButton" onclick="toggleRawView()" disabled>Raw</button>
           </div>
           <div class="reader-nav"><span>⌃</span><span>⌄</span></div>
@@ -2175,5 +2199,595 @@ function setCountStatus(text){
   if (c) c.textContent = text;
 }
 </script>
+
+<script id="emerald-mail-alpha2-enhancements-script">
+"use strict";
+
+/*
+  Emerald Mail Alpha 2 UI enhancements.
+  This script intentionally overrides selected UI functions from the base frontend.
+*/
+
+let enhancedTab = "all";
+let enhancedSortNewestFirst = true;
+
+document.addEventListener("DOMContentLoaded", () => {
+  enhanceMailUI();
+});
+
+function enhanceMailUI() {
+  const help = document.querySelector(".help");
+  if (help) help.onclick = openHelpDialog;
+
+  const accountChip = document.querySelector(".account-chip");
+  if (accountChip) accountChip.onclick = openSignature;
+
+  const searchButton = document.querySelector(".search button");
+  if (searchButton) searchButton.onclick = () => renderMessageList();
+
+  setupFolderButtons();
+  setupTabs();
+  setupToolbarButtons();
+  updateFolderCountsFromServer().catch(() => {});
+}
+
+function setupFolderButtons() {
+  const folderMap = [
+    ["Archive", "archive"],
+    ["Spam", "spam"],
+    ["Starred", "starred"],
+    ["Snoozed", "snoozed"],
+    ["Important", "important"],
+    ["Work", "work"],
+    ["Personal", "personal"],
+    ["Projects", "projects"],
+    ["Receipts", "receipts"],
+    ["Travel", "travel"]
+  ];
+
+  for (const [label, folder] of folderMap) {
+    const btn = Array.from(document.querySelectorAll(".nav-item")).find(el => el.textContent.trim().includes(label));
+    if (!btn) continue;
+    btn.id = "folder-" + folder;
+    btn.onclick = () => setFolder(folder);
+  }
+
+  const settings = document.querySelector(".side-footer span");
+  if (settings) settings.onclick = openSignature;
+}
+
+function setupTabs() {
+  const tabs = Array.from(document.querySelectorAll(".tab"));
+  const names = ["all", "unread", "starred"];
+
+  tabs.forEach((tab, index) => {
+    tab.onclick = () => {
+      enhancedTab = names[index] || "all";
+      tabs.forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      renderMessageList();
+    };
+  });
+
+  const sort = document.querySelector(".sort");
+  if (sort) {
+    sort.style.cursor = "pointer";
+    sort.onclick = () => {
+      enhancedSortNewestFirst = !enhancedSortNewestFirst;
+      sort.querySelector("span").textContent = enhancedSortNewestFirst ? "Newest first⌄" : "Oldest first⌃";
+      renderMessageList();
+      showToast(enhancedSortNewestFirst ? "Sorted newest first." : "Sorted oldest first.");
+    };
+  }
+}
+
+function setupToolbarButtons() {
+  const buttons = Array.from(document.querySelectorAll(".reader-actions button"));
+  for (const button of buttons) {
+    const text = button.textContent.toLowerCase();
+
+    if (text.includes("archive")) button.onclick = archiveSelectedMessage;
+    if (text.includes("spam")) button.onclick = spamSelectedMessage;
+    if (text.includes("move")) button.onclick = moveSelectedMessage;
+    if (text.includes("more")) button.onclick = moreActions;
+  }
+}
+
+const originalSetFolder = window.setFolder;
+window.setFolder = async function(folder) {
+  currentFolder = folder;
+  enhancedTab = "all";
+
+  document.querySelectorAll(".nav-item").forEach(btn => btn.classList.remove("active"));
+  const active = document.getElementById("folder-" + folder);
+  if (active) active.classList.add("active");
+
+  document.querySelectorAll(".tab").forEach((tab, index) => tab.classList.toggle("active", index === 0));
+
+  await loadFolder();
+};
+
+window.loadFolder = async function() {
+  clearViewer(false);
+
+  if (!currentAccount) return;
+
+  updateToolbarForFolder();
+
+  if (currentFolder === "drafts") {
+    currentMessages = getDrafts();
+    renderMessageList();
+    setStatus("Loaded drafts.");
+    updateFolderCountsFromServer().catch(() => {});
+    return;
+  }
+
+  try {
+    setStatus("Loading " + currentFolder + "...");
+    const res = await api("/api/messages?folder=" + encodeURIComponent(currentFolder));
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || "Could not load folder.");
+
+    currentMessages = data.messages || [];
+    renderMessageList();
+    setStatus("Loaded " + currentFolder + ".");
+    updateFolderCountsFromServer().catch(() => {});
+  } catch(error) {
+    currentMessages = [];
+    renderMessageList();
+    setStatus(error.message, true);
+    showToast(error.message, "bad");
+  }
+};
+
+window.renderMessageList = function() {
+  const list = document.getElementById("messageList");
+  if (!list) return;
+
+  const q = (document.getElementById("searchBox")?.value || "").trim().toLowerCase();
+  let messages = Array.from(currentMessages || []);
+
+  if (enhancedTab === "unread") messages = messages.filter(m => !Number(m.read));
+  if (enhancedTab === "starred") messages = messages.filter(m => Number(m.starred));
+
+  if (q) {
+    messages = messages.filter(m => [
+      m.subject, m.sender, m.recipient, m.text_preview, m.html_preview, m.received_at, m.folder
+    ].join(" ").toLowerCase().includes(q));
+  }
+
+  messages.sort((a,b) => {
+    const av = new Date(a.received_at || 0).getTime();
+    const bv = new Date(b.received_at || 0).getTime();
+    return enhancedSortNewestFirst ? bv - av : av - bv;
+  });
+
+  list.innerHTML = "";
+
+  if (!messages.length) {
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.style.margin = "18px";
+    empty.style.height = "calc(100% - 36px)";
+    empty.textContent = currentMessages.length ? "No messages match this view." : "No messages in this folder.";
+    list.appendChild(empty);
+    setCountStatus("0 messages");
+    return;
+  }
+
+  for (const msg of messages) {
+    const card = document.createElement("div");
+    card.className = "message-card " + (Number(msg.read) ? "read" : "unread");
+    if (selectedMessage && selectedMessage.id === msg.id) card.classList.add("selected");
+    card.dataset.id = msg.id;
+
+    const isSent = currentFolder === "sent";
+    const name = isSent ? (msg.recipient || "") : (msg.sender || "Unknown Sender");
+    const time = formatSmartDate(msg.received_at);
+
+    card.innerHTML = `
+      <div class="unread-dot"></div>
+      <div class="message-top">
+        <div class="sender">${escapeHtml(name)}</div>
+        <div class="message-time">${escapeHtml(time)}</div>
+      </div>
+      <div class="subject">${escapeHtml(msg.subject || "(No subject)")}</div>
+      <div class="preview">${escapeHtml(msg.text_preview || msg.html_preview || "")}</div>
+      <div class="star ${Number(msg.starred) ? "filled" : ""}" title="Toggle star">${Number(msg.starred) ? "★" : "☆"}</div>
+    `;
+
+    card.onclick = () => openMessage(msg.id);
+
+    const star = card.querySelector(".star");
+    if (star) {
+      star.onclick = event => {
+        event.stopPropagation();
+        toggleStarMessage(msg.id);
+      };
+    }
+
+    list.appendChild(card);
+  }
+
+  setCountStatus(messages.length + (messages.length === 1 ? " message" : " messages"));
+};
+
+window.openMessage = async function(id) {
+  const msg = currentMessages.find(m => m.id === id);
+  if (!msg) return;
+
+  selectedMessage = msg;
+  selectedRaw = "";
+  selectedParsed = null;
+  showingRaw = false;
+
+  if (!Number(msg.read)) {
+    msg.read = 1;
+    renderMessageList();
+
+    api("/api/message/read", {
+      method:"POST",
+      body:JSON.stringify({id})
+    }).then(() => updateFolderCountsFromServer()).catch(() => {});
+  } else {
+    renderMessageList();
+  }
+
+  showMobileViewer();
+  enableButtons(true);
+  updateToolbarForFolder();
+
+  if (currentFolder === "drafts") {
+    openCompose({
+      title:"Edit Draft",
+      to:msg.recipient || "",
+      cc:msg.cc || "",
+      bcc:msg.bcc || "",
+      subject:msg.subject || "",
+      text:msg.body || ""
+    });
+    return;
+  }
+
+  document.getElementById("viewer").innerHTML = '<div class="empty">Loading message...</div>';
+
+  try {
+    const res = await api("/api/message/raw?id=" + encodeURIComponent(id));
+    selectedRaw = await res.text();
+    selectedParsed = parseRawEmail(selectedRaw, msg);
+    renderParsedMessage(selectedParsed);
+    setStatus("Message opened.");
+  } catch(error) {
+    document.getElementById("viewer").innerHTML = `<div class="empty error">${escapeHtml(error.message)}</div>`;
+    setStatus(error.message, true);
+    showToast(error.message, "bad");
+  }
+};
+
+window.renderParsedMessage = function(parsed) {
+  const viewer = document.getElementById("viewer");
+  const sender = parsed.from || selectedMessage?.sender || "Unknown Sender";
+  const initials = initialsFromText(sender);
+  const folderLabel = currentFolder.charAt(0).toUpperCase() + currentFolder.slice(1);
+
+  viewer.innerHTML = `
+    <div class="mail-paper">
+      <div class="reader-subject">
+        <span>${escapeHtml(parsed.subject || "(No subject)")}</span>
+        <span class="folder-pill clickable" onclick="setFolder('${escapeHtml(currentFolder)}')">${escapeHtml(folderLabel)} ×</span>
+      </div>
+
+      <div class="meta-row">
+        <div class="person">
+          <div class="avatar">${escapeHtml(initials)}</div>
+          <div class="person-main">
+            <div><b>${escapeHtml(sender)}</b></div>
+            <div class="to-line">to ${escapeHtml(currentAccount?.display_name || currentAccount?.address || "you")}⌄</div>
+          </div>
+        </div>
+        <div class="reader-right">
+          <span>${escapeHtml(parsed.date || "")}</span>
+          <button class="btn" onclick="toggleStarSelected()" title="Star">${Number(selectedMessage?.starred) ? "★" : "☆"}</button>
+          <button class="btn" onclick="replyToSelected()">↩</button>
+          <button class="btn" onclick="moreActions()">⋮</button>
+        </div>
+      </div>
+
+      <div class="message-body">${linkifyAndEscape(parsed.body || "No readable body found.")}</div>
+
+      <div class="attachment-box">
+        <div class="attachment-left">
+          <div class="attachment-icon">▤</div>
+          <div>
+            <div style="font-weight:700">Raw_Message.eml</div>
+            <div style="color:var(--muted);font-size:13px">Stored in Emerald Mail</div>
+          </div>
+        </div>
+        <button class="btn" onclick="downloadRawMessage()">Download</button>
+      </div>
+
+      <div class="reply-strip">
+        <img src="./emerald-mail-logo.png" alt="Emerald Mail">
+        <div class="reply-placeholder">Click here to&nbsp;<a onclick="replyToSelected()">Reply</a>&nbsp;or&nbsp;<a onclick="forwardSelected()">Forward</a></div>
+        <button class="send-small" onclick="replyToSelected()">➤</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("rawButton").textContent = "Raw";
+};
+
+window.deleteSelectedMessage = async function() {
+  if (!selectedMessage) return;
+
+  if (currentFolder === "drafts") {
+    saveDrafts(getDrafts().filter(d => d.id !== selectedMessage.id));
+    updateDraftCount();
+    await loadFolder();
+    showToast("Draft deleted.");
+    return;
+  }
+
+  if (currentFolder === "trash") {
+    if (!confirm("Permanently delete this message forever? This cannot be undone.\n\n" + (selectedMessage.subject || "(No subject)"))) return;
+
+    try {
+      await runMessageAction("/api/message/permanent-delete", { id:selectedMessage.id });
+      showToast("Message permanently deleted.");
+      await loadFolder();
+    } catch(error) {
+      setStatus(error.message, true);
+      showToast(error.message, "bad");
+    }
+    return;
+  }
+
+  if (!confirm("Move this message to Trash?\n\n" + (selectedMessage.subject || "(No subject)"))) return;
+
+  try {
+    await runMessageAction("/api/message/delete", { id:selectedMessage.id });
+    showToast("Message moved to Trash.");
+    await loadFolder();
+  } catch(error) {
+    setStatus(error.message, true);
+    showToast(error.message, "bad");
+  }
+};
+
+async function runMessageAction(path, body) {
+  const res = await api(path, {
+    method:"POST",
+    body:JSON.stringify(body || {})
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || data.ok === false) throw new Error(data.error || "Action failed.");
+  return data;
+}
+
+async function toggleStarMessage(id) {
+  const msg = currentMessages.find(m => m.id === id);
+  if (!msg) return;
+
+  const next = !Number(msg.starred);
+  msg.starred = next ? 1 : 0;
+  renderMessageList();
+
+  try {
+    await runMessageAction("/api/message/star", { id, starred: next });
+    if (selectedMessage && selectedMessage.id === id) selectedMessage.starred = next ? 1 : 0;
+    showToast(next ? "Message starred." : "Message unstarred.");
+    updateFolderCountsFromServer().catch(() => {});
+  } catch(error) {
+    msg.starred = next ? 0 : 1;
+    renderMessageList();
+    showToast(error.message, "bad");
+  }
+}
+
+async function toggleStarSelected() {
+  if (!selectedMessage) return;
+  await toggleStarMessage(selectedMessage.id);
+  if (selectedParsed) renderParsedMessage(selectedParsed);
+}
+
+async function archiveSelectedMessage() {
+  if (!selectedMessage) return showToast("Select a message first.", "bad");
+  try {
+    await runMessageAction("/api/message/archive", { id:selectedMessage.id });
+    showToast("Message archived.");
+    await loadFolder();
+  } catch(error) {
+    showToast(error.message, "bad");
+  }
+}
+
+async function spamSelectedMessage() {
+  if (!selectedMessage) return showToast("Select a message first.", "bad");
+  try {
+    await runMessageAction("/api/message/spam", { id:selectedMessage.id });
+    showToast("Message moved to Spam.");
+    await loadFolder();
+  } catch(error) {
+    showToast(error.message, "bad");
+  }
+}
+
+async function restoreSelectedMessage() {
+  if (!selectedMessage) return showToast("Select a message first.", "bad");
+  try {
+    await runMessageAction("/api/message/restore", { id:selectedMessage.id });
+    showToast("Message restored to Inbox.");
+    await loadFolder();
+  } catch(error) {
+    showToast(error.message, "bad");
+  }
+}
+
+async function markUnreadSelected() {
+  if (!selectedMessage) return showToast("Select a message first.", "bad");
+  try {
+    selectedMessage.read = 0;
+    await runMessageAction("/api/message/unread", { id:selectedMessage.id });
+    renderMessageList();
+    updateFolderCountsFromServer().catch(() => {});
+    showToast("Message marked unread.");
+  } catch(error) {
+    showToast(error.message, "bad");
+  }
+}
+
+async function moveSelectedMessage() {
+  if (!selectedMessage) return showToast("Select a message first.", "bad");
+
+  const folder = prompt("Move to folder:", "work");
+  if (!folder) return;
+
+  try {
+    await runMessageAction("/api/message/move", { id:selectedMessage.id, folder });
+    showToast("Message moved to " + folder + ".");
+    await loadFolder();
+  } catch(error) {
+    showToast(error.message, "bad");
+  }
+}
+
+function moreActions() {
+  if (!selectedMessage) return showToast("Select a message first.", "bad");
+
+  const options = currentFolder === "trash"
+    ? "restore, unread, star, raw, delete-forever"
+    : "unread, star, archive, spam, move, raw, delete";
+
+  const choice = prompt("Choose action: " + options, currentFolder === "trash" ? "restore" : "unread");
+  if (!choice) return;
+
+  const c = choice.trim().toLowerCase();
+
+  if (c === "restore") return restoreSelectedMessage();
+  if (c === "unread" || c === "mark unread") return markUnreadSelected();
+  if (c === "star" || c === "unstar") return toggleStarSelected();
+  if (c === "archive") return archiveSelectedMessage();
+  if (c === "spam") return spamSelectedMessage();
+  if (c === "move") return moveSelectedMessage();
+  if (c === "raw") return toggleRawView();
+  if (c === "delete" || c === "trash") return deleteSelectedMessage();
+  if (c === "delete-forever" || c === "permanent" || c === "permanently delete") return deleteSelectedMessage();
+
+  showToast("Unknown action.", "bad");
+}
+
+function updateToolbarForFolder() {
+  const deleteButton = document.getElementById("deleteButton");
+  if (deleteButton) {
+    deleteButton.textContent = currentFolder === "trash" ? "♲ Delete Forever" : "♲ Delete";
+  }
+
+  const archiveButton = Array.from(document.querySelectorAll(".reader-actions button")).find(b => b.textContent.toLowerCase().includes("archive"));
+  if (archiveButton) {
+    archiveButton.disabled = currentFolder === "trash" || currentFolder === "drafts";
+  }
+}
+
+async function updateFolderCountsFromServer() {
+  try {
+    const res = await api("/api/messages/counts");
+    const data = await res.json();
+    if (!data.ok) return;
+
+    const counts = data.counts || {};
+    const ids = ["inbox","sent","drafts","trash","archive","spam","starred"];
+    for (const id of ids) {
+      const el = document.getElementById("count-" + id);
+      if (el) el.textContent = String(counts[id]?.total || (id === "drafts" ? getDrafts().length : 0));
+    }
+  } catch {
+    const active = document.getElementById("count-" + currentFolder);
+    if (active) active.textContent = String((currentMessages || []).length);
+  }
+}
+
+function openHelpDialog() {
+  const viewer = document.getElementById("viewer");
+  if (!viewer) {
+    alert("Emerald Mail help: use folders, search, compose, and message actions from the toolbar.");
+    return;
+  }
+
+  viewer.innerHTML = `
+    <div class="mail-paper help-panel">
+      <h3>Emerald Mail Help</h3>
+      <p>All main controls are now wired to actions.</p>
+      <ul>
+        <li><b>Compose</b> opens the message composer.</li>
+        <li><b>Refresh</b> reloads the current folder.</li>
+        <li><b>Search</b> filters the current message list.</li>
+        <li><b>Archive, Spam, Move, Delete</b> act on the selected message.</li>
+        <li><b>Trash Delete</b> permanently deletes the message.</li>
+        <li><b>Star</b> toggles starred status.</li>
+        <li><b>More</b> opens extra actions like mark unread and restore.</li>
+      </ul>
+    </div>
+  `;
+  showMobileViewer();
+}
+
+function openSignature() {
+  const overlay = document.getElementById("signatureOverlay");
+  const text = document.getElementById("signatureText");
+  if (text) text.value = currentAccount?.signature || "";
+  if (overlay) overlay.classList.add("open");
+}
+
+function downloadRawMessage() {
+  if (!selectedRaw) return showToast("No raw message loaded.", "bad");
+  const blob = new Blob([selectedRaw], { type:"message/rfc822" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = (selectedMessage?.subject || "message").replace(/[^a-z0-9._-]+/gi, "_") + ".eml";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function forwardSelected() {
+  if (!selectedMessage) return;
+
+  const parsed = selectedParsed || parseRawEmail(selectedRaw, selectedMessage);
+  const subject = (selectedMessage.subject || "").toLowerCase().startsWith("fwd:")
+    ? selectedMessage.subject
+    : "Fwd: " + (selectedMessage.subject || "(No subject)");
+
+  let body = "\n\n";
+  if (currentAccount?.signature) body += currentAccount.signature + "\n\n";
+  body += "----- Forwarded Message -----\n";
+  body += "From: " + (parsed.from || selectedMessage.sender || "") + "\n";
+  body += "Date: " + (parsed.date || formatDate(selectedMessage.received_at)) + "\n";
+  body += "Subject: " + (parsed.subject || selectedMessage.subject || "") + "\n\n";
+  body += parsed.body || "";
+
+  openCompose({
+    title:"Forward",
+    to:"",
+    subject,
+    text:body
+  });
+}
+
+function showToast(message, type = "good") {
+  let stack = document.querySelector(".toast-stack");
+  if (!stack) {
+    stack = document.createElement("div");
+    stack.className = "toast-stack";
+    document.body.appendChild(stack);
+  }
+
+  const toast = document.createElement("div");
+  toast.className = "toast " + (type === "bad" ? "bad" : "good");
+  toast.textContent = message;
+  stack.appendChild(toast);
+
+  setTimeout(() => toast.remove(), 3200);
+}
+</script>
+
 </body>
 </html>
