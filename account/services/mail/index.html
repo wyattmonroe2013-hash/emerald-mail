@@ -1,0 +1,2179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Emerald Mail</title>
+
+<style>
+:root{
+  --green:#0f9565;
+  --green-dark:#08794f;
+  --green-soft:#e9f7f0;
+  --green-soft-2:#d8f1e6;
+  --text:#172232;
+  --muted:#657487;
+  --line:#dbe3eb;
+  --line-2:#cbd6e2;
+  --panel:#ffffff;
+  --glass:rgba(255,255,255,.82);
+  --bg:#edf3f8;
+  --shadow:0 8px 24px rgba(28,46,69,.10);
+  --danger:#9a2d2d;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden}
+body{
+  font-family:"Segoe UI",Tahoma,Arial,sans-serif;
+  color:var(--text);
+  background:#eaf0f6;
+}
+button,input,textarea{font-family:inherit}
+button{cursor:pointer}
+img{display:block}
+
+#loginScreen{
+  position:fixed;
+  inset:0;
+  display:grid;
+  place-items:center;
+  z-index:10;
+  background:
+    radial-gradient(circle at 20% 10%,rgba(255,255,255,.95),transparent 34%),
+    radial-gradient(circle at 80% 18%,rgba(190,220,242,.78),transparent 36%),
+    linear-gradient(135deg,#f7fbff,#cbd8e8);
+}
+
+.login-card{
+  width:min(860px,calc(100vw - 36px));
+  border:1px solid #8ea0b8;
+  border-radius:14px;
+  background:rgba(246,250,255,.92);
+  box-shadow:0 22px 60px rgba(38,55,80,.25), inset 0 1px rgba(255,255,255,.96);
+  overflow:hidden;
+}
+
+.login-head{
+  padding:22px 24px;
+  text-align:center;
+  background:linear-gradient(#fff,#dfeaf6);
+  border-bottom:1px solid #b8c5d6;
+}
+
+.login-head img{
+  width:250px;
+  max-width:80%;
+  margin:0 auto 14px auto;
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,.14));
+}
+
+.login-head h1{
+  margin:0 0 6px 0;
+  font-size:28px;
+  letter-spacing:-.35px;
+}
+
+.login-head p{
+  margin:0;
+  color:#64758b;
+  font-size:14px;
+}
+
+.login-body{
+  padding:18px;
+  display:grid;
+  gap:14px;
+}
+
+.login-panel{
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  gap:14px;
+}
+
+.login-box,.admin-box{
+  border:1px solid #c4d0df;
+  border-radius:12px;
+  background:#fff;
+  padding:14px;
+  box-shadow:0 2px 8px rgba(30,50,80,.07);
+}
+
+.panel-title{
+  font-size:12px;
+  color:#66788e;
+  text-transform:uppercase;
+  font-weight:800;
+  letter-spacing:.5px;
+  margin-bottom:10px;
+}
+
+.endpoint-card{
+  border:1px solid #c6d2df;
+  border-radius:10px;
+  padding:10px;
+  background:linear-gradient(#fff,#edf4fb);
+  margin-bottom:12px;
+}
+
+.endpoint-label{
+  font-size:11px;
+  font-weight:800;
+  text-transform:uppercase;
+  color:#65758a;
+  letter-spacing:.45px;
+}
+
+.endpoint-url{
+  margin-top:4px;
+  font:12px Consolas,"Courier New",monospace;
+  color:#174f85;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+.hint-line{
+  font-size:12px;
+  color:#6f7f91;
+  margin-top:4px;
+}
+
+.field-grid,.admin-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+label{
+  display:block;
+  margin-bottom:5px;
+  font-size:13px;
+  font-weight:700;
+  color:#35465a;
+}
+
+input,textarea{
+  width:100%;
+  border:1px solid #b7c4d3;
+  border-radius:9px;
+  padding:9px 10px;
+  font-size:13px;
+  color:#172232;
+  background:#fff;
+  outline:none;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.08);
+}
+
+input:focus,textarea:focus{
+  border-color:#5ab893;
+  box-shadow:0 0 0 3px rgba(15,149,101,.12), inset 0 1px 3px rgba(0,0,0,.08);
+}
+
+.login-actions{
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:8px;
+  margin-top:12px;
+}
+
+.btn{
+  min-height:34px;
+  border:1px solid #9badc2;
+  border-radius:9px;
+  padding:7px 14px;
+  color:#26384d;
+  background:linear-gradient(#fff,#e5ecf4);
+  box-shadow:inset 0 1px rgba(255,255,255,.95);
+}
+
+.btn.primary{
+  color:#fff;
+  border-color:#08794f;
+  background:linear-gradient(#139b6a,#08794f);
+  font-weight:700;
+}
+
+#adminOutput{
+  display:none;
+  white-space:pre-wrap;
+  margin-top:10px;
+  max-height:160px;
+  overflow:auto;
+  color:#526477;
+  font:12px Consolas,"Courier New",monospace;
+}
+
+#appScreen{
+  display:none;
+  height:100vh;
+  width:100vw;
+  overflow:hidden;
+  background:#edf3f8;
+}
+
+.mail-frame{
+  height:100%;
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  border:4px solid rgba(126,153,173,.86);
+  border-radius:18px;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.42),rgba(255,255,255,0) 30%),
+    linear-gradient(#eef5fa,#f8fbfd);
+}
+
+.mail-header{
+  height:96px;
+  flex:0 0 96px;
+  display:grid;
+  grid-template-columns:320px 190px 170px minmax(260px,1fr) 300px;
+  align-items:center;
+  gap:16px;
+  padding:16px 24px;
+  border-bottom:1px solid var(--line-2);
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.82),rgba(226,238,247,.74)),
+    radial-gradient(circle at 12% 10%,rgba(194,224,238,.8),transparent 32%);
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  min-width:0;
+}
+
+.brand img{
+  width:58px;
+  height:58px;
+  object-fit:contain;
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,.14));
+}
+
+.brand-title{
+  font-size:28px;
+  font-weight:750;
+  letter-spacing:-.35px;
+  color:var(--green-dark);
+  white-space:nowrap;
+}
+
+.brand-title span{
+  color:#6a7582;
+  font-weight:500;
+}
+
+.compose-btn{
+  height:56px;
+  border:0;
+  border-radius:18px;
+  color:#fff;
+  font-size:16px;
+  font-weight:800;
+  background:linear-gradient(#159d6d,#0b7d53);
+  box-shadow:0 8px 18px rgba(15,149,101,.22);
+}
+
+.refresh-btn{
+  height:56px;
+  border:1px solid #d5dee8;
+  border-radius:18px;
+  color:#415368;
+  font-size:15px;
+  background:linear-gradient(#fff,#edf2f7);
+}
+
+.search{
+  height:56px;
+  display:flex;
+  align-items:center;
+  overflow:hidden;
+  border:1px solid #d5dee8;
+  border-radius:26px;
+  background:#fff;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.04);
+}
+
+.search input{
+  border:0;
+  box-shadow:none;
+  height:100%;
+  padding:0 20px;
+  font-size:15px;
+}
+
+.search button{
+  width:62px;
+  height:100%;
+  border:0;
+  background:#fff;
+  color:#4c5d71;
+  font-size:22px;
+}
+
+.profile{
+  justify-self:end;
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+
+.help{
+  width:46px;
+  height:46px;
+  border:1px solid #d5dee8;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  color:#4c5d71;
+  font-weight:800;
+  background:#f9fbfd;
+}
+
+.account-chip{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding-left:16px;
+  border-left:1px solid #d4dde7;
+  min-width:180px;
+}
+
+.account-chip img{
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  object-fit:contain;
+  padding:4px;
+  background:#fff;
+  border:1px solid #d4dde7;
+}
+
+.account-name{
+  font-weight:800;
+  color:#1e2d3f;
+  max-width:130px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.account-sub{
+  color:#6d7d90;
+  font-size:13px;
+  max-width:130px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.mail-main{
+  flex:1;
+  min-height:0;
+  display:grid;
+  grid-template-columns:320px 520px 1fr;
+  overflow:hidden;
+}
+
+.sidebar{
+  min-height:0;
+  overflow:auto;
+  padding:22px 18px;
+  border-right:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(244,248,251,.78));
+}
+
+.nav-item{
+  height:48px;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  border:0;
+  border-radius:14px;
+  padding:0 16px;
+  background:transparent;
+  color:#405166;
+  font-size:16px;
+  text-align:left;
+}
+
+.nav-item:hover{
+  background:rgba(236,243,248,.9);
+}
+
+.nav-item.active{
+  background:linear-gradient(90deg,#dff2e9,#eef8f4);
+  color:#0c7d54;
+  font-weight:800;
+}
+
+.nav-left{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.nav-icon{
+  width:20px;
+  text-align:center;
+  color:#526477;
+}
+
+.nav-item.active .nav-icon{
+  color:#0c7d54;
+}
+
+.badge{
+  min-width:34px;
+  height:30px;
+  border-radius:18px;
+  display:grid;
+  place-items:center;
+  background:#e7edf3;
+  color:#657487;
+  font-weight:800;
+}
+
+.nav-item.active .badge{
+  background:#bee9d4;
+  color:#0c7d54;
+}
+
+.folder-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin:18px 10px 10px;
+  color:#6a7889;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+}
+
+.storage{
+  margin-top:24px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:rgba(255,255,255,.78);
+  padding:16px;
+}
+
+.storage-title{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  margin-bottom:2px;
+  font-weight:700;
+}
+
+.storage-meta{
+  color:#526477;
+  font-size:14px;
+  margin-left:34px;
+}
+
+.storage-bar{
+  height:9px;
+  border-radius:20px;
+  background:#dce5ed;
+  overflow:hidden;
+  margin-top:12px;
+}
+
+.storage-fill{
+  height:100%;
+  width:32%;
+  background:linear-gradient(90deg,#0f9565,#45bf8a);
+  border-radius:20px;
+}
+
+.side-footer{
+  margin-top:28px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  color:#526477;
+  font-size:22px;
+}
+
+.toggle{
+  display:inline-block;
+  vertical-align:middle;
+  width:46px;
+  height:24px;
+  border-radius:30px;
+  background:#cbd5df;
+  position:relative;
+  margin-left:8px;
+}
+
+.toggle::after{
+  content:"";
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:#fff;
+  position:absolute;
+  left:3px;
+  top:3px;
+  box-shadow:0 1px 5px rgba(0,0,0,.18);
+}
+
+.list-pane{
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  border-right:1px solid var(--line);
+  background:rgba(255,255,255,.86);
+}
+
+.list-tabs{
+  height:70px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 28px;
+  border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.84);
+}
+
+.tabs{
+  display:flex;
+  gap:34px;
+  align-items:center;
+  height:100%;
+}
+
+.tab{
+  height:100%;
+  display:flex;
+  align-items:center;
+  position:relative;
+  color:#526477;
+  font-weight:650;
+}
+
+.tab.active{
+  color:#0b7d53;
+}
+
+.tab.active::after{
+  content:"";
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  height:4px;
+  border-radius:4px 4px 0 0;
+  background:#0b9a67;
+}
+
+.sort{
+  color:#526477;
+  display:flex;
+  gap:16px;
+  align-items:center;
+}
+
+#messageList{
+  flex:1;
+  min-height:0;
+  overflow:auto;
+}
+
+.message-card{
+  height:112px;
+  position:relative;
+  border-bottom:1px solid var(--line);
+  padding:18px 44px 14px 50px;
+  background:rgba(255,255,255,.84);
+  cursor:pointer;
+}
+
+.message-card:hover{
+  background:#f7fbfd;
+}
+
+.message-card.selected{
+  border:1px solid #b7e4d1;
+  background:linear-gradient(90deg,#e8f8f1,#f5fcf9);
+  border-radius:12px;
+  margin:0 6px;
+}
+
+.message-card.unread .sender,
+.message-card.unread .subject{
+  font-weight:850;
+}
+
+.unread-dot{
+  position:absolute;
+  left:20px;
+  top:47px;
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  background:#119765;
+}
+
+.message-card.read .unread-dot{
+  display:none;
+}
+
+.message-top{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+}
+
+.sender{
+  font-size:16px;
+  color:#172232;
+  max-width:290px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.message-time{
+  color:#526477;
+  font-size:14px;
+  white-space:nowrap;
+}
+
+.message-card.selected .message-time{
+  color:#0c7d54;
+  font-weight:750;
+}
+
+.subject{
+  margin-top:4px;
+  color:#172232;
+  font-size:15px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.preview{
+  margin-top:6px;
+  color:#637487;
+  font-size:14px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.star{
+  position:absolute;
+  right:24px;
+  bottom:24px;
+  color:#7b8999;
+  font-size:20px;
+}
+
+.star.filled{
+  color:#e7b11b;
+}
+
+.viewer-pane{
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  background:linear-gradient(135deg,#fff,#f8fbfd 72%,#eef5f9);
+}
+
+.reader-toolbar{
+  height:70px;
+  flex:0 0 70px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 28px;
+  border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.84);
+}
+
+.reader-actions{
+  display:flex;
+  align-items:center;
+  gap:28px;
+  color:#405166;
+  font-size:15px;
+}
+
+.reader-actions button{
+  border:0;
+  background:transparent;
+  color:inherit;
+  font-size:15px;
+}
+
+.reader-actions button:disabled{
+  opacity:.45;
+}
+
+.reader-nav{
+  display:flex;
+  gap:26px;
+  color:#405166;
+  font-size:18px;
+}
+
+.viewer{
+  flex:1;
+  min-height:0;
+  overflow:auto;
+  padding:36px 42px;
+}
+
+.empty{
+  height:100%;
+  display:grid;
+  place-items:center;
+  color:#6b7a8c;
+  border:1px dashed #cbd6e2;
+  border-radius:20px;
+  background:rgba(255,255,255,.62);
+}
+
+.mail-paper{
+  width:100%;
+  max-width:none;
+}
+
+.reader-subject{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  font-size:25px;
+  line-height:1.2;
+  font-weight:850;
+  color:#172232;
+  margin-bottom:34px;
+}
+
+.folder-pill{
+  padding:8px 12px;
+  border-radius:10px;
+  background:#cbead8;
+  color:#08794f;
+  font-size:14px;
+  font-weight:750;
+}
+
+.meta-row{
+  display:flex;
+  justify-content:space-between;
+  gap:22px;
+  margin-bottom:34px;
+}
+
+.person{
+  display:flex;
+  gap:14px;
+  align-items:flex-start;
+}
+
+.avatar{
+  width:54px;
+  height:54px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:#d6eee4;
+  color:#08794f;
+  font-weight:850;
+  font-size:20px;
+}
+
+.person-main{
+  font-size:15px;
+}
+
+.person-main b{
+  font-size:16px;
+}
+
+.to-line{
+  color:#405166;
+  margin-top:5px;
+}
+
+.reader-right{
+  color:#526477;
+  display:flex;
+  align-items:flex-start;
+  gap:22px;
+}
+
+.message-body{
+  font-size:17px;
+  line-height:1.68;
+  color:#172232;
+  white-space:pre-wrap;
+}
+
+.message-body a{
+  color:#08794f;
+}
+
+.attachment-box{
+  margin-top:32px;
+  width:360px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:rgba(255,255,255,.74);
+  padding:14px 16px;
+}
+
+.attachment-left{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.attachment-icon{
+  font-size:32px;
+  color:#657487;
+}
+
+.reply-strip{
+  margin-top:42px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  border:1px solid var(--line);
+  border-radius:20px;
+  background:rgba(255,255,255,.76);
+  padding:14px;
+}
+
+.reply-strip img{
+  width:50px;
+  height:50px;
+  object-fit:contain;
+  border-radius:50%;
+  background:#ecf7f2;
+  padding:5px;
+}
+
+.reply-placeholder{
+  flex:1;
+  height:50px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  padding:0 18px;
+  color:#657487;
+}
+
+.reply-placeholder a{
+  color:#08794f;
+  font-weight:700;
+}
+
+.send-small{
+  width:52px;
+  height:52px;
+  border:0;
+  border-radius:14px;
+  background:linear-gradient(#159d6d,#0b7d53);
+  color:#fff;
+  font-size:22px;
+}
+
+.raw{
+  white-space:pre-wrap;
+  font:12px/1.45 Consolas,"Courier New",monospace;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:#fff;
+  padding:16px;
+}
+
+.dialog-backdrop{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:20;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:rgba(25,42,60,.36);
+  backdrop-filter:blur(5px);
+}
+
+.dialog-backdrop.open{
+  display:flex;
+}
+
+.dialog{
+  width:min(920px,100%);
+  height:min(780px,100%);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  border:1px solid #c7d2df;
+  border-radius:20px;
+  background:#fff;
+  box-shadow:0 24px 70px rgba(20,36,54,.3);
+}
+
+.dialog-title{
+  height:64px;
+  flex:0 0 64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 20px;
+  border-bottom:1px solid var(--line);
+  background:linear-gradient(#fff,#eef4f9);
+  font-weight:850;
+  font-size:18px;
+}
+
+.dialog-body{
+  flex:1;
+  min-height:0;
+  overflow:auto;
+  display:grid;
+  gap:12px;
+  padding:20px;
+}
+
+.compose-row{
+  display:grid;
+  grid-template-columns:80px 1fr;
+  align-items:center;
+  gap:10px;
+}
+
+.compose-text{
+  min-height:270px;
+  resize:none;
+}
+
+.dialog-actions{
+  height:68px;
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  align-items:center;
+  padding:0 20px;
+  border-top:1px solid var(--line);
+  background:#f7fafc;
+}
+
+.attach-list{
+  display:grid;
+  gap:8px;
+}
+
+.attach-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 12px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#fff;
+}
+
+.attach-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+}
+
+.attach-thumb{
+  width:38px;
+  height:32px;
+  object-fit:cover;
+  border:1px solid var(--line);
+  border-radius:6px;
+}
+
+.attach-name{
+  max-width:450px;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+.status{
+  height:32px;
+  flex:0 0 32px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 14px;
+  border-top:1px solid var(--line);
+  background:#f4f8fb;
+  color:#526477;
+  font-size:13px;
+}
+
+.error{color:var(--danger)!important;font-weight:800}
+.success{color:var(--green-dark)!important;font-weight:800}
+
+@media(max-width:1350px){
+  .mail-main{grid-template-columns:290px 430px 1fr}
+  .mail-header{grid-template-columns:290px 170px 150px minmax(220px,1fr) 260px}
+}
+
+@media(max-width:1050px){
+  .mail-header{grid-template-columns:1fr auto auto; height:auto; flex-basis:auto; row-gap:12px}
+  .search{grid-column:1 / -1}
+  .profile{grid-column:3}
+  .mail-main{grid-template-columns:250px 1fr}
+  .viewer-pane{display:none}
+  .mail-main.show-viewer{grid-template-columns:1fr}
+  .mail-main.show-viewer .sidebar,.mail-main.show-viewer .list-pane{display:none}
+  .mail-main.show-viewer .viewer-pane{display:flex}
+}
+
+@media(max-width:760px){
+  .login-panel,.field-grid,.admin-grid{grid-template-columns:1fr}
+  .mail-main{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .brand-title{font-size:22px}
+}
+</style>
+</head>
+
+<body>
+<section id="loginScreen">
+  <div class="login-card">
+    <div class="login-head">
+      <img src="./emerald-mail-logo.png" alt="Emerald Mail">
+      <h1>Emerald Mail</h1>
+      <p>Sign in with your mailbox password.</p>
+    </div>
+
+    <div class="login-body">
+      <div class="login-panel">
+        <div class="login-box">
+          <div class="panel-title">Sign in</div>
+
+          <div class="endpoint-card">
+            <div class="endpoint-label">Connected backend</div>
+            <div class="endpoint-url">https://emerald-mail-router.wyatt-monroe2013.workers.dev</div>
+            <div class="hint-line">This frontend is already connected to your Emerald Mail Worker.</div>
+          </div>
+
+          <div class="field-grid">
+            <div>
+              <label for="loginAddress">Email Address</label>
+              <input id="loginAddress" placeholder="support@mail.monroecorp.org" autocomplete="username">
+            </div>
+            <div>
+              <label for="loginPassword">Password</label>
+              <input id="loginPassword" type="password" placeholder="Account password" autocomplete="current-password">
+            </div>
+            <div>
+              <label>&nbsp;</label>
+              <label style="font-weight:500;margin-top:8px">
+                <input id="rememberLogin" type="checkbox" style="width:auto"> Remember this session
+              </label>
+            </div>
+          </div>
+
+          <div class="login-actions">
+            <button class="btn" onclick="healthCheck()">Check Backend</button>
+            <button class="btn primary" onclick="login()">Sign In</button>
+          </div>
+        </div>
+
+        <div class="admin-box">
+          <div class="panel-title">Setup and account creation</div>
+          <div class="admin-grid">
+            <div>
+              <label for="adminKey">Admin Key</label>
+              <input id="adminKey" type="password" placeholder="EMERALD_MAIL_ADMIN_KEY">
+            </div>
+            <div>
+              <label for="newAddress">New Account Address</label>
+              <input id="newAddress" placeholder="support@mail.monroecorp.org">
+            </div>
+            <div>
+              <label for="newDisplayName">Display Name</label>
+              <input id="newDisplayName" placeholder="Support">
+            </div>
+            <div>
+              <label for="newFromName">From Name</label>
+              <input id="newFromName" placeholder="Monroe Support">
+            </div>
+            <div>
+              <label for="newPassword">New Account Password</label>
+              <input id="newPassword" type="password" placeholder="At least 8 characters">
+            </div>
+            <div>
+              <label for="newSignature">Signature</label>
+              <input id="newSignature" placeholder="-- Monroe Corporation Support">
+            </div>
+          </div>
+
+          <div class="login-actions">
+            <button class="btn" onclick="runSetup()">Run Setup</button>
+            <button class="btn" onclick="listAdminAccounts()">List Accounts</button>
+            <button class="btn primary" onclick="createAccount()">Create Account</button>
+          </div>
+
+          <div id="adminOutput" class="endpoint-card"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="appScreen">
+  <div class="mail-frame">
+    <header class="mail-header">
+      <div class="brand">
+        <img src="./emerald-mail-logo.png" alt="Emerald Mail">
+        <div class="brand-title">Emerald <span>Mail</span></div>
+      </div>
+
+      <button class="compose-btn" onclick="openCompose()">✎&nbsp; Compose</button>
+      <button class="refresh-btn" onclick="loadFolder()">⟳&nbsp; Refresh</button>
+
+      <div class="search">
+        <input id="searchBox" placeholder="Search mail" oninput="renderMessageList()">
+        <button>⌕</button>
+      </div>
+
+      <div class="profile">
+        <button class="help">?</button>
+        <div class="account-chip">
+          <img src="./emerald-mail-logo.png" alt="Profile">
+          <div>
+            <div id="profileName" class="account-name">Emerald User</div>
+            <div id="profileSub" class="account-sub">Mailbox</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main id="main" class="mail-main">
+      <aside class="sidebar">
+        <button id="folder-inbox" class="nav-item active" onclick="setFolder('inbox')">
+          <span class="nav-left"><span class="nav-icon">▣</span><span>Inbox</span></span>
+          <span id="count-inbox" class="badge">0</span>
+        </button>
+        <button id="folder-sent" class="nav-item" onclick="setFolder('sent')">
+          <span class="nav-left"><span class="nav-icon">✈</span><span>Sent</span></span>
+          <span id="count-sent" class="badge">0</span>
+        </button>
+        <button id="folder-drafts" class="nav-item" onclick="setFolder('drafts')">
+          <span class="nav-left"><span class="nav-icon">▤</span><span>Drafts</span></span>
+          <span id="count-drafts" class="badge">0</span>
+        </button>
+        <button id="folder-trash" class="nav-item" onclick="setFolder('trash')">
+          <span class="nav-left"><span class="nav-icon">♲</span><span>Trash</span></span>
+          <span id="count-trash" class="badge">0</span>
+        </button>
+        <button class="nav-item">
+          <span class="nav-left"><span class="nav-icon">▥</span><span>Archive</span></span>
+        </button>
+        <button class="nav-item">
+          <span class="nav-left"><span class="nav-icon">◇</span><span>Spam</span></span>
+          <span class="badge">0</span>
+        </button>
+        <button class="nav-item">
+          <span class="nav-left"><span class="nav-icon">☆</span><span>Starred</span></span>
+        </button>
+        <button class="nav-item">
+          <span class="nav-left"><span class="nav-icon">◷</span><span>Snoozed</span></span>
+        </button>
+        <button class="nav-item">
+          <span class="nav-left"><span class="nav-icon">⚑</span><span>Important</span></span>
+        </button>
+
+        <div class="folder-title">
+          <span>Folders</span>
+          <span>+</span>
+        </div>
+        <button class="nav-item"><span class="nav-left"><span class="nav-icon">□</span><span>Work</span></span></button>
+        <button class="nav-item"><span class="nav-left"><span class="nav-icon">□</span><span>Personal</span></span></button>
+        <button class="nav-item"><span class="nav-left"><span class="nav-icon">□</span><span>Projects</span></span></button>
+        <button class="nav-item"><span class="nav-left"><span class="nav-icon">□</span><span>Receipts</span></span></button>
+        <button class="nav-item"><span class="nav-left"><span class="nav-icon">□</span><span>Travel</span></span></button>
+
+        <div class="storage">
+          <div class="storage-title"><span style="color:var(--green);font-size:24px">☁</span><span>Storage</span></div>
+          <div class="storage-meta">2.4 GB of 15 GB used</div>
+          <div class="storage-bar"><div class="storage-fill"></div></div>
+        </div>
+
+        <div class="side-footer">
+          <span>⚙</span>
+          <span>☼ <span class="toggle"></span></span>
+        </div>
+      </aside>
+
+      <section class="list-pane">
+        <div class="list-tabs">
+          <div class="tabs">
+            <div class="tab active">All</div>
+            <div class="tab">Unread</div>
+            <div class="tab">Starred</div>
+          </div>
+          <div class="sort"><span>Sort⌄</span><span>☷</span></div>
+        </div>
+        <div id="messageList"></div>
+      </section>
+
+      <section class="viewer-pane">
+        <div class="reader-toolbar">
+          <div class="reader-actions">
+            <button onclick="backToList()">←</button>
+            <button>▣&nbsp; Archive</button>
+            <button id="deleteButton" onclick="deleteSelectedMessage()" disabled>♲&nbsp; Delete</button>
+            <button>◇&nbsp; Spam</button>
+            <button>□&nbsp; Move⌄</button>
+            <button>•••&nbsp; More</button>
+            <button id="rawButton" onclick="toggleRawView()" disabled>Raw</button>
+          </div>
+          <div class="reader-nav"><span>⌃</span><span>⌄</span></div>
+        </div>
+
+        <div id="viewer" class="viewer">
+          <div class="empty">Select a message to read it.</div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="status">
+      <div id="status">Ready.</div>
+      <div id="countStatus">Emerald Mail</div>
+    </footer>
+  </div>
+</section>
+
+<div id="composeOverlay" class="dialog-backdrop">
+  <div class="dialog">
+    <div class="dialog-title">
+      <span id="composeTitle">New Message</span>
+      <button class="btn" onclick="closeCompose()">Close</button>
+    </div>
+    <div class="dialog-body">
+      <div class="compose-row"><label>From</label><input id="composeFrom" readonly></div>
+      <div class="compose-row"><label>To</label><input id="composeTo"></div>
+      <div class="compose-row"><label>Cc</label><input id="composeCc"></div>
+      <div class="compose-row"><label>Bcc</label><input id="composeBcc"></div>
+      <div class="compose-row"><label>Subject</label><input id="composeSubject"></div>
+      <div class="compose-row">
+        <label>Format</label>
+        <div>
+          <label style="display:inline;font-weight:500"><input id="htmlMode" type="checkbox" checked style="width:auto"> Send HTML with clickable links</label>
+          <label style="display:inline;font-weight:500;margin-left:12px"><input id="inlineImages" type="checkbox" style="width:auto"> Insert images inline</label>
+        </div>
+      </div>
+      <textarea id="composeText" class="compose-text" placeholder="Write your message..."></textarea>
+      <div>
+        <label>Attachments</label>
+        <input id="attachmentInput" type="file" multiple onchange="handleAttachmentPick(event)">
+        <div id="attachmentList" class="attach-list" style="margin-top:8px"></div>
+      </div>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn" onclick="saveDraft()">Save Draft</button>
+      <button class="btn primary" onclick="sendComposedMessage()">Send</button>
+    </div>
+  </div>
+</div>
+
+<div id="signatureOverlay" class="dialog-backdrop">
+  <div class="dialog" style="height:min(430px,100%)">
+    <div class="dialog-title">
+      <span>Account Signature</span>
+      <button class="btn" onclick="closeSignature()">Close</button>
+    </div>
+    <div class="dialog-body">
+      <textarea id="signatureText" style="min-height:180px" placeholder="--&#10;Monroe Corporation"></textarea>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn primary" onclick="saveSignature()">Save Signature</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+const EMERALD_MAIL_WORKER_URL = "https://emerald-mail-router.wyatt-monroe2013.workers.dev";
+
+let currentAccount = null;
+let currentFolder = "inbox";
+let currentMessages = [];
+let selectedMessage = null;
+let selectedRaw = "";
+let selectedParsed = null;
+let showingRaw = false;
+let composeAttachments = [];
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("loginPassword").addEventListener("keydown", event => {
+    if (event.key === "Enter") login();
+  });
+  document.getElementById("rememberLogin").checked = localStorage.getItem("emerald_mail_v6_remember") === "true";
+  showLogin();
+});
+
+function showLogin(){
+  document.getElementById("loginScreen").style.display = "grid";
+  document.getElementById("appScreen").style.display = "none";
+}
+
+function showApp(){
+  document.getElementById("loginScreen").style.display = "none";
+  document.getElementById("appScreen").style.display = "block";
+}
+
+function getWorkerUrl(){
+  return EMERALD_MAIL_WORKER_URL.replace(/\/$/, "");
+}
+
+function setSessionToken(token){
+  if (document.getElementById("rememberLogin").checked) {
+    localStorage.setItem("emerald_mail_v6_session", token);
+    sessionStorage.removeItem("emerald_mail_v6_session");
+  } else {
+    sessionStorage.setItem("emerald_mail_v6_session", token);
+    localStorage.removeItem("emerald_mail_v6_session");
+  }
+}
+
+function activeToken(){
+  return sessionStorage.getItem("emerald_mail_v6_session") || localStorage.getItem("emerald_mail_v6_session") || "";
+}
+
+function saveLocalSettings(){
+  localStorage.setItem("emerald_mail_v6_remember", document.getElementById("rememberLogin").checked ? "true" : "false");
+}
+
+async function api(path, options = {}){
+  const token = activeToken();
+  const headers = {
+    "Content-Type":"application/json",
+    ...(token ? {"Authorization":"Bearer " + token} : {}),
+    ...(options.headers || {})
+  };
+
+  return fetch(getWorkerUrl() + path, {
+    ...options,
+    headers
+  });
+}
+
+async function adminApi(path, options = {}){
+  const adminKey = document.getElementById("adminKey").value.trim();
+  if (!adminKey) throw new Error("Missing admin key.");
+
+  const separator = path.includes("?") ? "&" : "?";
+
+  return fetch(getWorkerUrl() + path + separator + "admin_key=" + encodeURIComponent(adminKey), {
+    ...options,
+    headers:{
+      "Content-Type":"application/json",
+      ...(options.headers || {})
+    }
+  });
+}
+
+async function healthCheck(){
+  try {
+    setStatus("Checking backend...");
+    const res = await fetch(getWorkerUrl() + "/api/health");
+    const data = await res.json();
+    showAdminOutput(data);
+    if (!data.ok) throw new Error(data.error || "Health check failed.");
+    setStatus("Backend connected.", false, true);
+  } catch(error) {
+    setStatus(error.message, true);
+  }
+}
+
+async function runSetup(){
+  try {
+    setStatus("Running setup...");
+    const res = await adminApi("/api/setup");
+    const data = await res.json();
+    showAdminOutput(data);
+    if (!data.ok) throw new Error(data.error || "Setup failed.");
+    setStatus("Setup complete.", false, true);
+  } catch(error) {
+    setStatus(error.message, true);
+  }
+}
+
+async function createAccount(){
+  try {
+    const body = {
+      address: document.getElementById("newAddress").value.trim(),
+      display_name: document.getElementById("newDisplayName").value.trim(),
+      from_name: document.getElementById("newFromName").value.trim(),
+      password: document.getElementById("newPassword").value,
+      signature: document.getElementById("newSignature").value,
+      can_send: 1,
+      can_receive: 1,
+      is_admin: 0
+    };
+
+    const res = await adminApi("/api/admin/accounts/create", {
+      method:"POST",
+      body:JSON.stringify(body)
+    });
+
+    const data = await res.json();
+    showAdminOutput(data);
+    if (!data.ok) throw new Error(data.error || "Account creation failed.");
+    setStatus("Account created.", false, true);
+  } catch(error) {
+    setStatus(error.message, true);
+  }
+}
+
+async function listAdminAccounts(){
+  try {
+    const res = await adminApi("/api/admin/accounts");
+    const data = await res.json();
+    showAdminOutput(data);
+    if (!data.ok) throw new Error(data.error || "Could not list accounts.");
+    setStatus("Accounts loaded.", false, true);
+  } catch(error) {
+    setStatus(error.message, true);
+  }
+}
+
+function showAdminOutput(data){
+  const out = document.getElementById("adminOutput");
+  out.style.display = "block";
+  out.textContent = JSON.stringify(data, null, 2);
+}
+
+async function login(){
+  try {
+    saveLocalSettings();
+    setStatus("Signing in...");
+
+    const res = await fetch(getWorkerUrl() + "/api/auth/login", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        address: document.getElementById("loginAddress").value.trim(),
+        password: document.getElementById("loginPassword").value
+      })
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) throw new Error(data.error || "Login failed.");
+
+    setSessionToken(data.token);
+    currentAccount = data.account;
+    applyAccountToUI();
+    showApp();
+    currentFolder = "inbox";
+    await loadFolder();
+    setStatus("Signed in.", false, true);
+  } catch(error) {
+    setStatus(error.message, true);
+  }
+}
+
+async function logout(){
+  try {
+    await api("/api/auth/logout", {method:"POST", body:"{}"});
+  } catch {}
+
+  sessionStorage.removeItem("emerald_mail_v6_session");
+  localStorage.removeItem("emerald_mail_v6_session");
+  currentAccount = null;
+  currentMessages = [];
+  selectedMessage = null;
+  showLogin();
+  setStatus("Signed out.");
+}
+
+function applyAccountToUI(){
+  const name = currentAccount?.display_name || "Emerald User";
+  const address = currentAccount?.address || "Mailbox";
+  document.getElementById("profileName").textContent = name;
+  document.getElementById("profileSub").textContent = address;
+}
+
+async function loadFolder(){
+  clearViewer(false);
+
+  if (!currentAccount) return;
+
+  if (currentFolder === "drafts") {
+    currentMessages = getDrafts();
+    renderMessageList();
+    setStatus("Loaded drafts.");
+    return;
+  }
+
+  try {
+    setStatus("Loading " + currentFolder + "...");
+    const res = await api("/api/messages?folder=" + encodeURIComponent(currentFolder));
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || "Could not load folder.");
+
+    currentMessages = data.messages || [];
+    renderMessageList();
+    setStatus("Loaded " + currentFolder + ".");
+  } catch(error) {
+    currentMessages = [];
+    renderMessageList();
+    setStatus(error.message, true);
+  }
+}
+
+function setFolder(folder){
+  currentFolder = folder;
+  document.querySelectorAll(".nav-item").forEach(btn => btn.classList.remove("active"));
+  const active = document.getElementById("folder-" + folder);
+  if (active) active.classList.add("active");
+  loadFolder();
+}
+
+function renderMessageList(){
+  const list = document.getElementById("messageList");
+  const q = document.getElementById("searchBox").value.trim().toLowerCase();
+  let messages = currentMessages;
+
+  if (q) {
+    messages = messages.filter(m => [
+      m.subject, m.sender, m.recipient, m.text_preview, m.received_at
+    ].join(" ").toLowerCase().includes(q));
+  }
+
+  list.innerHTML = "";
+
+  if (!messages.length) {
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.style.margin = "18px";
+    empty.style.height = "calc(100% - 36px)";
+    empty.textContent = currentMessages.length ? "No messages match your search." : "No messages in this folder.";
+    list.appendChild(empty);
+    setCountStatus("0 messages");
+    updateFolderCounts(0);
+    return;
+  }
+
+  for (const msg of messages) {
+    const card = document.createElement("div");
+    card.className = "message-card " + (Number(msg.read) ? "read" : "unread");
+    if (selectedMessage && selectedMessage.id === msg.id) card.classList.add("selected");
+    card.dataset.id = msg.id;
+
+    const isSent = currentFolder === "sent";
+    const name = isSent ? (msg.recipient || "") : (msg.sender || "Unknown Sender");
+    const time = formatSmartDate(msg.received_at);
+
+    card.innerHTML = `
+      <div class="unread-dot"></div>
+      <div class="message-top">
+        <div class="sender">${escapeHtml(name)}</div>
+        <div class="message-time">${escapeHtml(time)}</div>
+      </div>
+      <div class="subject">${escapeHtml(msg.subject || "(No subject)")}</div>
+      <div class="preview">${escapeHtml(msg.text_preview || "")}</div>
+      <div class="star ${msg.starred ? "filled" : ""}">${msg.starred ? "★" : "☆"}</div>
+    `;
+
+    card.onclick = () => openMessage(msg.id);
+    list.appendChild(card);
+  }
+
+  setCountStatus(messages.length + (messages.length === 1 ? " message" : " messages"));
+  updateFolderCounts(messages.length);
+}
+
+function updateFolderCounts(count){
+  const target = document.getElementById("count-" + currentFolder);
+  if (target) target.textContent = String(count ?? currentMessages.length);
+  const inbox = document.getElementById("count-inbox");
+  if (currentFolder === "inbox" && inbox) inbox.textContent = String(count ?? currentMessages.length);
+}
+
+async function openMessage(id){
+  const msg = currentMessages.find(m => m.id === id);
+  if (!msg) return;
+
+  selectedMessage = msg;
+  selectedRaw = "";
+  selectedParsed = null;
+  showingRaw = false;
+
+  // Mark as read visually immediately.
+  if (!Number(msg.read)) {
+    msg.read = 1;
+    renderMessageList();
+
+    // Persist read state in backend.
+    api("/api/message/read", {
+      method:"POST",
+      body:JSON.stringify({id})
+    }).catch(() => {});
+  } else {
+    renderMessageList();
+  }
+
+  showMobileViewer();
+  enableButtons(true);
+
+  if (currentFolder === "drafts") {
+    openCompose({
+      title:"Edit Draft",
+      to:msg.recipient || "",
+      cc:msg.cc || "",
+      bcc:msg.bcc || "",
+      subject:msg.subject || "",
+      text:msg.body || ""
+    });
+    return;
+  }
+
+  document.getElementById("viewer").innerHTML = '<div class="empty">Loading message...</div>';
+
+  try {
+    const res = await api("/api/message/raw?id=" + encodeURIComponent(id));
+    selectedRaw = await res.text();
+    selectedParsed = parseRawEmail(selectedRaw, msg);
+    renderParsedMessage(selectedParsed);
+    setStatus("Message opened.");
+  } catch(error) {
+    document.getElementById("viewer").innerHTML = `<div class="empty error">${escapeHtml(error.message)}</div>`;
+    setStatus(error.message, true);
+  }
+}
+
+function renderParsedMessage(parsed){
+  const viewer = document.getElementById("viewer");
+  const sender = parsed.from || selectedMessage?.sender || "Unknown Sender";
+  const initials = initialsFromText(sender);
+  const folderLabel = currentFolder.charAt(0).toUpperCase() + currentFolder.slice(1);
+
+  viewer.innerHTML = `
+    <div class="mail-paper">
+      <div class="reader-subject">
+        <span>${escapeHtml(parsed.subject || "(No subject)")}</span>
+        <span class="folder-pill">${escapeHtml(folderLabel)} ×</span>
+      </div>
+
+      <div class="meta-row">
+        <div class="person">
+          <div class="avatar">${escapeHtml(initials)}</div>
+          <div class="person-main">
+            <div><b>${escapeHtml(sender)}</b></div>
+            <div class="to-line">to ${escapeHtml(currentAccount?.display_name || currentAccount?.address || "you")}⌄</div>
+          </div>
+        </div>
+        <div class="reader-right">
+          <span>${escapeHtml(parsed.date || "")}</span>
+          <span>☆</span>
+          <span>↩</span>
+          <span>⋮</span>
+        </div>
+      </div>
+
+      <div class="message-body">${linkifyAndEscape(parsed.body || "No readable body found.")}</div>
+
+      <div class="attachment-box">
+        <div class="attachment-left">
+          <div class="attachment-icon">▤</div>
+          <div>
+            <div style="font-weight:700">Raw_Message.eml</div>
+            <div style="color:var(--muted);font-size:13px">Stored in Emerald Mail</div>
+          </div>
+        </div>
+        <div style="color:var(--muted)">⇩</div>
+      </div>
+
+      <div class="reply-strip">
+        <img src="./emerald-mail-logo.png" alt="Emerald Mail">
+        <div class="reply-placeholder">Click here to&nbsp;<a onclick="replyToSelected()">Reply</a>&nbsp;or&nbsp;<a onclick="replyToSelected()">Forward</a></div>
+        <button class="send-small" onclick="replyToSelected()">➤</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("rawButton").textContent = "Raw";
+}
+
+function renderRaw(){
+  document.getElementById("viewer").innerHTML = `<div class="raw">${escapeHtml(selectedRaw || "No raw message loaded.")}</div>`;
+  document.getElementById("rawButton").textContent = "Parsed";
+}
+
+function toggleRawView(){
+  if (!selectedMessage || !selectedRaw) return;
+  showingRaw = !showingRaw;
+  showingRaw ? renderRaw() : renderParsedMessage(selectedParsed || parseRawEmail(selectedRaw, selectedMessage));
+}
+
+function clearViewer(setReady = true){
+  selectedMessage = null;
+  selectedRaw = "";
+  selectedParsed = null;
+  showingRaw = false;
+  document.getElementById("viewer").innerHTML = '<div class="empty">Select a message to read it.</div>';
+  enableButtons(false);
+  if (setReady) setStatus("Ready.");
+}
+
+function enableButtons(enabled){
+  document.getElementById("deleteButton").disabled = !enabled;
+  document.getElementById("rawButton").disabled = !enabled;
+}
+
+function showMobileViewer(){
+  document.getElementById("main").classList.add("show-viewer");
+}
+
+function backToList(){
+  document.getElementById("main").classList.remove("show-viewer");
+}
+
+async function deleteSelectedMessage(){
+  if (!selectedMessage) return;
+
+  if (currentFolder === "drafts") {
+    saveDrafts(getDrafts().filter(d => d.id !== selectedMessage.id));
+    updateDraftCount();
+    await loadFolder();
+    return;
+  }
+
+  if (!confirm("Move this message to Trash?\n\n" + (selectedMessage.subject || "(No subject)"))) return;
+
+  try {
+    await api("/api/message/delete", {
+      method:"POST",
+      body:JSON.stringify({id:selectedMessage.id})
+    });
+    setStatus("Message moved to Trash.");
+    await loadFolder();
+  } catch(error) {
+    setStatus(error.message, true);
+  }
+}
+
+function openCompose(prefill = {}){
+  if (!currentAccount) return;
+
+  composeAttachments = [];
+  renderAttachmentList();
+
+  document.getElementById("composeTitle").textContent = prefill.title || "New Message";
+  document.getElementById("composeFrom").value = (currentAccount.from_name || "Emerald Mail") + " <" + currentAccount.address + ">";
+  document.getElementById("composeTo").value = prefill.to || "";
+  document.getElementById("composeCc").value = prefill.cc || "";
+  document.getElementById("composeBcc").value = prefill.bcc || "";
+  document.getElementById("composeSubject").value = prefill.subject || "";
+  document.getElementById("htmlMode").checked = true;
+  document.getElementById("inlineImages").checked = false;
+
+  let text = prefill.text || "";
+  if (!text && currentAccount.signature) text = "\n\n" + currentAccount.signature;
+
+  document.getElementById("composeText").value = text;
+  document.getElementById("composeOverlay").classList.add("open");
+}
+
+function closeCompose(){
+  document.getElementById("composeOverlay").classList.remove("open");
+}
+
+function replyToSelected(){
+  if (!selectedMessage) return;
+
+  const parsed = selectedParsed || parseRawEmail(selectedRaw, selectedMessage);
+  const subject = (selectedMessage.subject || "").toLowerCase().startsWith("re:")
+    ? selectedMessage.subject
+    : "Re: " + (selectedMessage.subject || "(No subject)");
+
+  let quote = "\n\n";
+  if (currentAccount.signature) quote += currentAccount.signature + "\n\n";
+  quote += "----- Original Message -----\n";
+  quote += "From: " + (parsed.from || selectedMessage.sender || "") + "\n";
+  quote += "Date: " + (parsed.date || formatDate(selectedMessage.received_at)) + "\n\n";
+  quote += parsed.body || "";
+
+  openCompose({
+    title:"Reply",
+    to:selectedMessage.sender || parsed.from || "",
+    subject,
+    text:quote
+  });
+}
+
+function getComposePayload(){
+  const text = document.getElementById("composeText").value;
+  const htmlMode = document.getElementById("htmlMode").checked;
+  const headers = {};
+
+  if (selectedMessage && document.getElementById("composeTitle").textContent === "Reply") {
+    if (selectedMessage.message_id) headers["In-Reply-To"] = selectedMessage.message_id;
+    const refs = [selectedMessage.references_header, selectedMessage.message_id].filter(Boolean).join(" ");
+    if (refs) headers["References"] = refs;
+  }
+
+  let html = "";
+  if (htmlMode) {
+    html = textToHtml(text);
+    if (document.getElementById("inlineImages").checked) {
+      for (const file of composeAttachments) {
+        if (file.disposition === "inline" && file.content_id) {
+          html += `<p><img src="cid:${escapeHtml(file.content_id)}" alt="${escapeHtml(file.filename)}" style="max-width:100%;height:auto;"></p>`;
+        }
+      }
+    }
+  }
+
+  return {
+    to: document.getElementById("composeTo").value.trim(),
+    cc: document.getElementById("composeCc").value.trim(),
+    bcc: document.getElementById("composeBcc").value.trim(),
+    subject: document.getElementById("composeSubject").value.trim(),
+    text,
+    html,
+    headers,
+    attachments: composeAttachments
+  };
+}
+
+async function sendComposedMessage(){
+  const payload = getComposePayload();
+
+  if (!payload.to || !payload.subject || !payload.text.trim()) {
+    setStatus("To, subject, and body are required.", true);
+    return;
+  }
+
+  try {
+    setStatus("Sending message...");
+    const res = await api("/api/send", {
+      method:"POST",
+      body:JSON.stringify(payload)
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data.ok === false) throw new Error(data.error || "Send failed.");
+
+    closeCompose();
+    setStatus("Message sent.", false, true);
+    if (currentFolder === "sent") loadFolder();
+  } catch(error) {
+    setStatus(error.message, true);
+  }
+}
+
+function saveDraft(){
+  const p = getComposePayload();
+  const drafts = getDrafts();
+
+  drafts.unshift({
+    id: crypto.randomUUID(),
+    folder:"drafts",
+    recipient:p.to,
+    cc:p.cc,
+    bcc:p.bcc,
+    subject:p.subject || "(No subject)",
+    body:p.text,
+    text_preview:p.text.slice(0,300),
+    received_at:new Date().toISOString(),
+    read:1
+  });
+
+  saveDrafts(drafts);
+  updateDraftCount();
+  setStatus("Draft saved.");
+}
+
+async function handleAttachmentPick(event){
+  const files = Array.from(event.target.files || []);
+  for (const file of files) {
+    const base64 = await fileToBase64(file);
+    const isImage = file.type.startsWith("image/");
+    const cid = isImage ? "img-" + crypto.randomUUID() : "";
+
+    composeAttachments.push({
+      filename:file.name,
+      type:file.type || "application/octet-stream",
+      content:base64,
+      disposition:isImage && document.getElementById("inlineImages").checked ? "inline" : "attachment",
+      content_id:isImage ? cid : undefined,
+      preview:isImage ? URL.createObjectURL(file) : ""
+    });
+  }
+  renderAttachmentList();
+  event.target.value = "";
+}
+
+function renderAttachmentList(){
+  const list = document.getElementById("attachmentList");
+  list.innerHTML = "";
+
+  composeAttachments.forEach((a, index) => {
+    const item = document.createElement("div");
+    item.className = "attach-item";
+
+    const left = document.createElement("div");
+    left.className = "attach-left";
+
+    if (a.preview) {
+      const img = document.createElement("img");
+      img.className = "attach-thumb";
+      img.src = a.preview;
+      left.appendChild(img);
+    }
+
+    const name = document.createElement("div");
+    name.className = "attach-name";
+    name.textContent = a.filename + " (" + a.disposition + ")";
+    left.appendChild(name);
+
+    const right = document.createElement("div");
+
+    if (a.type && a.type.startsWith("image/")) {
+      const toggle = document.createElement("button");
+      toggle.className = "btn";
+      toggle.textContent = a.disposition === "inline" ? "Inline" : "Attach";
+      toggle.onclick = () => {
+        a.disposition = a.disposition === "inline" ? "attachment" : "inline";
+        renderAttachmentList();
+      };
+      right.appendChild(toggle);
+    }
+
+    const remove = document.createElement("button");
+    remove.className = "btn";
+    remove.textContent = "Remove";
+    remove.onclick = () => {
+      composeAttachments.splice(index,1);
+      renderAttachmentList();
+    };
+    right.appendChild(remove);
+
+    item.append(left,right);
+    list.appendChild(item);
+  });
+}
+
+function fileToBase64(file){
+  return new Promise((resolve,reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(",")[1] || "");
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function getDraftKey(){
+  return "emerald_mail_v6_drafts_" + (currentAccount ? currentAccount.address : "unknown");
+}
+
+function getDrafts(){
+  try { return JSON.parse(localStorage.getItem(getDraftKey()) || "[]"); }
+  catch { return []; }
+}
+
+function saveDrafts(drafts){
+  localStorage.setItem(getDraftKey(), JSON.stringify(drafts));
+}
+
+function updateDraftCount(){
+  document.getElementById("count-drafts").textContent = String(getDrafts().length);
+}
+
+function parseRawEmail(raw, fallback){
+  const normalized = String(raw || "").replace(/\r\n/g,"\n");
+  const split = normalized.indexOf("\n\n");
+  const headerText = split >= 0 ? normalized.slice(0, split) : "";
+  const bodyText = split >= 0 ? normalized.slice(split + 2) : normalized;
+  const headers = parseHeaders(headerText);
+  const ct = (headers["content-type"] || "").toLowerCase();
+
+  let body = "";
+  if (ct.includes("multipart/")) body = extractTextFromMultipart(bodyText, headers["content-type"]);
+  else body = decodeMaybeQuotedPrintable(bodyText);
+
+  return {
+    subject:decodeMimeHeader(headers.subject || fallback.subject || "(No subject)"),
+    from:decodeMimeHeader(headers.from || fallback.sender || ""),
+    to:decodeMimeHeader(headers.to || fallback.recipient || ""),
+    date:headers.date || formatDate(fallback.received_at),
+    body:cleanupBody(body)
+  };
+}
+
+function parseHeaders(headerText){
+  const headers = {};
+  let key = "";
+
+  for (const line of String(headerText || "").split("\n")) {
+    if (/^\s/.test(line) && key) {
+      headers[key] += " " + line.trim();
+      continue;
+    }
+
+    const i = line.indexOf(":");
+    if (i === -1) continue;
+
+    key = line.slice(0,i).trim().toLowerCase();
+    headers[key] = line.slice(i+1).trim();
+  }
+
+  return headers;
+}
+
+function extractTextFromMultipart(bodyText, ct){
+  const m = /boundary="?([^";]+)"?/i.exec(ct || "");
+  if (!m) return decodeMaybeQuotedPrintable(bodyText);
+
+  const parts = bodyText.split("--" + m[1]);
+  let plain = "";
+  let html = "";
+
+  for (const part of parts) {
+    const trimmed = part.trim();
+    if (!trimmed || trimmed === "--") continue;
+
+    const split = trimmed.indexOf("\n\n");
+    const ph = parseHeaders(split >= 0 ? trimmed.slice(0, split) : "");
+    const pb = split >= 0 ? trimmed.slice(split + 2) : trimmed;
+    const type = (ph["content-type"] || "").toLowerCase();
+    const enc = (ph["content-transfer-encoding"] || "").toLowerCase();
+    let decoded = enc.includes("quoted-printable") ? decodeQuotedPrintable(pb) : pb;
+
+    if (type.includes("text/plain") && !plain) plain = decoded;
+    if (type.includes("text/html") && !html) html = htmlToText(decoded);
+  }
+
+  return plain || html || decodeMaybeQuotedPrintable(bodyText);
+}
+
+function decodeMaybeQuotedPrintable(v){
+  const t = String(v || "");
+  if (t.includes("=0A") || t.includes("=0D") || /=\n/.test(t) || /=[A-Fa-f0-9]{2}/.test(t)) return decodeQuotedPrintable(t);
+  return t;
+}
+
+function decodeQuotedPrintable(input){
+  try {
+    return String(input || "")
+      .replace(/=\n/g,"")
+      .replace(/=([A-Fa-f0-9]{2})/g,(_,h)=>String.fromCharCode(parseInt(h,16)));
+  } catch {
+    return String(input || "");
+  }
+}
+
+function decodeMimeHeader(v){
+  return String(v || "").replace(/=\?([^?]+)\?([BQbq])\?([^?]+)\?=/g,(_,charset,enc,data)=>{
+    try { return enc.toUpperCase() === "B" ? atob(data) : decodeQuotedPrintable(data.replace(/_/g," ")); }
+    catch { return data; }
+  });
+}
+
+function htmlToText(html){
+  const clean = String(html || "")
+    .replace(/<script[\s\S]*?<\/script>/gi,"")
+    .replace(/<style[\s\S]*?<\/style>/gi,"")
+    .replace(/<br\s*\/?>/gi,"\n")
+    .replace(/<\/p>/gi,"\n\n")
+    .replace(/<\/div>/gi,"\n")
+    .replace(/<[^>]+>/g,"");
+
+  const textarea = document.createElement("textarea");
+  textarea.innerHTML = clean;
+  return textarea.value;
+}
+
+function cleanupBody(body){
+  return String(body || "").replace(/\n{4,}/g,"\n\n\n").trim();
+}
+
+function escapeHtml(value){
+  return String(value || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function linkifyAndEscape(text){
+  return escapeHtml(text).replace(/(https?:\/\/[^\s<>"']+)/g, url => {
+    const clean = url.replace(/[),.;!?]+$/,"");
+    const tail = url.slice(clean.length);
+    return `<a href="${clean}" target="_blank" rel="noopener noreferrer">${clean}</a>${escapeHtml(tail)}`;
+  });
+}
+
+function textToHtml(text){
+  return "<div>" + linkifyAndEscape(text).replace(/\n/g,"<br>") + "</div>";
+}
+
+function initialsFromText(value){
+  const cleaned = String(value || "").replace(/<[^>]+>/g, "").trim();
+  const match = cleaned.match(/^([^<@]+)/);
+  const base = match ? match[1].replace(/["']/g,"").trim() : cleaned;
+  const parts = base.split(/\s+/).filter(Boolean);
+  if (!parts.length) return "?";
+  return parts.slice(0,2).map(p => p[0].toUpperCase()).join("");
+}
+
+function formatSmartDate(value){
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return String(value || "");
+  const now = new Date();
+  if (d.toDateString() === now.toDateString()) {
+    return d.toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+  }
+  const y = new Date();
+  y.setDate(now.getDate() - 1);
+  if (d.toDateString() === y.toDateString()) return "Yesterday";
+  return d.toLocaleDateString([], {month:"short", day:"numeric"});
+}
+
+function formatDate(value){
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? String(value || "") : d.toLocaleString();
+}
+
+function setStatus(text, isError=false, isSuccess=false){
+  const s = document.getElementById("status") || document.createElement("div");
+  s.textContent = text;
+  s.classList.toggle("error", isError);
+  s.classList.toggle("success", isSuccess);
+}
+
+function setCountStatus(text){
+  const c = document.getElementById("countStatus");
+  if (c) c.textContent = text;
+}
+</script>
+</body>
+</html>
